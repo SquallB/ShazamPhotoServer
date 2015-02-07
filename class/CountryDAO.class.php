@@ -16,12 +16,7 @@ class CountryDAO extends DAO {
 		');
 		$stmt->bindParam(':id', $id);
 		$stmt->execute();
-		// Set the fetchmode to populate an instance of 'Country'
-		// This enables us to use the following:
-		// $country = $repository->find(1234);
-		// echo $country->getName();
-		$stmt->setFetchMode(PDO::FETCH_CLASS, 'Country'); 
-		return $stmt->fetch();
+		return new Country($stmt->fetch());
 	}
 
 	public function findAll() {
@@ -30,15 +25,14 @@ class CountryDAO extends DAO {
 			FROM country
 		');
 		$stmt->execute();
-		$stmt->setFetchMode(PDO::FETCH_CLASS, 'Country');
-		// fetchAll() will do the same as above, but we'll have an array. ie:
-		// $countries = $repository->findAll();
-		// echo $country[0]->getName(); 
-		return $stmt->fetchAll();
+		$array = array();
+		foreach($stmt->fetchAll() as $row) {
+			$array[] = new Country($row);
+		}
+		return $array;
 	}
 
 	public function save($data) {
-		 // If the ID is set, we're updating an existing record
 		if (isset($data->id)) {
 			return $this->update($data);
 		}
@@ -56,7 +50,6 @@ class CountryDAO extends DAO {
 	public function update($data) {
 		$id = $data->getId();
 		if(!isset($id)) {
-			// We can't update a record unless it exists...
 			throw new \LogicException(
 				'Cannot update country that does not yet exist in the database.'
 			);
@@ -75,7 +68,6 @@ class CountryDAO extends DAO {
 	public function delete ($data) {
 		$id = $data->getId();
 		if(!isset($id)) {
-			// We can't delete a record unless it exists...
 			throw new \LogicException(
 				'Cannot delete country that does not yet exist in the database.'
 			);

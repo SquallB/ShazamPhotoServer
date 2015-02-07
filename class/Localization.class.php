@@ -5,10 +5,15 @@ class Localization implements JsonSerializable {
 	private $latitude;
 	private $longitude;
 
-	public function __construct($id = 0, $latitude = 0, $longitude = 0) {
-		$this->setId($id);
-		$this->setLatitude($latitude);
-		$this->setLongitude($longitude);
+	public function __construct($data = null) {
+		if(is_array($data)) {
+			if(isset($data['id'])) {
+				$this->setId($data['id']);
+			}
+
+			$this->setLatitude($data['latitude']);
+			$this->setLongitude($data['longitude']);
+		}
 	}
 
 	public function getId() {

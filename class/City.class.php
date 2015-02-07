@@ -1,14 +1,27 @@
 <?php
 
+include_once('Country.class.php');
+
 class City implements JsonSerializable {
 	private $id;
 	private $name;
 	private $country;
 
-	public function __construct($id = 0, $name = "", $country = NULL) {
-		$this->setId($id);
-		$this->setName($name);
-		$this->setCountry($country);
+	public function __construct($data = null) {
+		if(is_array($data)) {
+			if(isset($data['id'])) {
+				$this->setId($data['id']);
+			}
+
+			$this->setName($data['name']);
+
+			if(isset($data['country'])) {
+				$this->setCountry($data['country']);
+			}
+			else {
+				$this->setCountry(new Country(array('id' => $data['co_id'], 'name' => $data['co_name'])));
+			}
+		}
 	}	
 
 	public function getId() {

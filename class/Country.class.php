@@ -7,10 +7,10 @@ class Country implements JsonSerializable {
 	public function __construct($data = null) {
 		if (is_array($data)) {
 			if (isset($data['id'])) {
-				$this->id = $data['id'];
+				$this->setId($data['id']);
 			}
 
-			$this->name = $data['name'];
+			$this->setName($data['name']);
 		}
 	}	
 

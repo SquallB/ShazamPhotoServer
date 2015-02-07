@@ -1,16 +1,29 @@
 <?php
 
+include_once('City.class.php');
+
 class Address implements JsonSerializable {
 	private $id;
 	private $number;
 	private $street;
 	private $city;
 
-	public function __construct($id = 0, $number = "", $street = "", $city = NULL) {
-		$this->setId($id);
-		$this->setNumber($number);
-		$this->setStreet($street);
-		$this->setCity($city);
+	public function __construct($data = null) {
+		if(is_array($data)) {
+			if(isset($data['id'])) {
+				$this->setId($data['id']);
+			}
+
+			$this->setNumber($data['number']);
+			$this->setStreet($data['street']);
+			
+			if(isset($data['city'])) {
+				$this->setCity($data['city']);
+			}
+			else {
+				$this->setCity(new City(array('id' => $data['ci_id'], 'name' => $data['ci_name'], 'co_id' => $data['co_id'], 'co_name' => $data['co_name'])));
+			}
+		}
 	}	
 
 	public function getId() {
@@ -34,7 +47,7 @@ class Address implements JsonSerializable {
  	}
 
  	public function getStreet() {
- 		return $this->number;
+ 		return $this->street;
  	}
 
  	public function setStreet($street) {

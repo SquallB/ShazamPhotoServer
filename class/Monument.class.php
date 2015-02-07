@@ -1,5 +1,8 @@
 <?php
 
+include_once('Localization.class.php');
+include_once('Address.class.php');
+
 class Monument implements JsonSerializable {
 	private $id;
 	private $characteristics;
@@ -10,15 +13,20 @@ class Monument implements JsonSerializable {
 	private $localization;
 	private $address;
 
-	public function __construct($id = 0, $characteristics = array(), $photoPath = "", $year = 0, $nbVisitors = 0, $nbLikes = 0, $localization = NULL, $address = NULL) {
-		$this->setId($id);
-		$this->setCharacteristics($characteristics);
-		$this->setPhotoPath($photoPath);
-		$this->setYear($year);
-		$this->setNbVisitors($nbVisitors);
-		$this->setNbLikes($nbLikes);
-		$this->setLocalization($localization);
-		$this->setAddress($address);
+	public function __construct($data = null) {
+		if (is_array($data)) {
+			if (isset($data['id'])) {
+				$this->setId($data['id']);
+			}
+			
+			//$this->setCharacteristics($characteristics);
+			$this->setPhotoPath($data['photopath']);
+			$this->setYear($data['year']);
+			$this->setNbVisitors($data['nbvisitors']);
+			$this->setNbLikes($data['nblikes']);
+			$this->setLocalization(new Localization(array('id' => $data['l_id'], 'latitude' => $data['latitude'], 'longitude' => $data['longitude'])));
+			$this->setAddress(new Address(array('id' => $data['a_id'], 'number' => $data['number'], 'street' => $data['street'], 'ci_id' => $data['ci_id'], 'ci_name' =>  $data['ci_name'], 'co_id' => $data['co_id'], 'co_name' => $data['co_name'])));
+		}
 	}	
 
 	public function getId() {

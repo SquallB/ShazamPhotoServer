@@ -6,13 +6,13 @@ class Language implements JsonSerializable {
 	private $value;
 
 	public function __construct($data = null) {
-		if (is_array($data)) {
-			if (isset($data['id'])) {
-				$this->id = $data['id'];
+		if(is_array($data)) {
+			if(isset($data['id'])) {
+				$this->setId($data['id']);
 			}
 
-			$this->name = $data['name'];
-			$this->value = $data['value'];
+			$this->setName($data['name']);
+			$this->setValue($data['value']);
 		}
 	}
 
