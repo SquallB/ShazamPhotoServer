@@ -25,18 +25,9 @@
 			}
 
 			if(isset($column) && isset($argument)) {
-				include('pgconf.php');
-				$db = pg_connect($pgconf);
-				$result = pg_prepare($db, "my_query", 'SELECT * FROM monument WHERE name LIKE $1;');
-				$result = pg_execute($db, "my_query", array('%'.$argument.'%'));
-
-				if($result) {
-					while($row = pg_fetch_assoc($result)) {
-						$json[] = $row;
-					}
-				}
-
-				pg_close($db);
+				include_once('class/MonumentDAO.class.php');
+				$dao = new MonumentDAO();
+				$json = $dao->findAll();
 			}
 		}
 	}

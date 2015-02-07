@@ -1,15 +1,29 @@
 <?php
 
+include_once('Language.class.php');
+
 class MonumentCharacteristics implements JsonSerializable {
 	private $id;
 	private $name;
 	private $description;
 	private $language;
 
-	public function __construct($id = 0, $name = "", $country = NULL) {
-		$this->setId($id);
-		$this->setName($name);
-		$this->setCountry($country);
+	public function __construct($data = null) {
+		if(is_array($data)) {
+			if(isset($data['id'])) {
+				$this->setId($data['id']);
+			}
+
+			$this->setName($data['name']);
+			$this->setDescription($data['description']);
+
+			if(isset($data['language'])) {
+				$this->setLanguage($data['language']);
+			}
+			else {
+				$this->setLanguage(new Language(array('id' => $data['l_id'], 'name' => $data['l_name'], 'value' => $data['l_value'])));
+			}
+		}
 	}	
 
 	public function getId() {
@@ -54,7 +68,6 @@ class MonumentCharacteristics implements JsonSerializable {
 
  	public function jsonSerialize() {
         return [
-            'id' => $this->getId(),
             'name' => $this->getName(),
             'description' => $this->getDescription(),
             'language' => $this->getLanguage()

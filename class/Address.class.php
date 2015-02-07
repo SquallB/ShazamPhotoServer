@@ -68,7 +68,6 @@ class Address implements JsonSerializable {
 
  	public function jsonSerialize() {
         return [
-            'id' => $this->getId(),
             'number' => $this->getNumber(),
             'street' => $this->getStreet(),
             'city' => $this->getCity()

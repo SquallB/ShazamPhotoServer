@@ -48,7 +48,6 @@ class Language implements JsonSerializable {
 
 	public function jsonSerialize() {
         return [
-            'id' => $this->getId(),
             'name' => $this->getName(),
             'value' => $this->getValue()
         ];

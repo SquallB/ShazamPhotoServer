@@ -48,7 +48,6 @@ class Localization implements JsonSerializable {
 
 	public function jsonSerialize() {
         return [
-            'id' => $this->getId(),
             'latitude' => $this->getLatitude(),
             'longitude' => $this->getLongitude()
         ];
