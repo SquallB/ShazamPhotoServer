@@ -5,15 +5,19 @@
 	$db = pg_connect($pgconf);
 
 	$countries = '';
-	$result = pg_query($db, 'SELECT name FROM country ORDER BY name');
-	while($row = pg_fetch_row($result)) {
-		$countries .= '<option value="'. $row[0] .'">' . $row[0] . '</option>';
+	include_once('class/CountryDAO.class.php');
+	$countryDAO = new CountryDAO();
+	$countriesArray = $countryDAO->findAll();
+	foreach($countriesArray as $country) {
+		$countries .= '<option value="'. $country->getName() .'">' . $country->getName() . '</option>';
 	}
 
 	$languages = '';
-	$result = pg_query($db, 'SELECT name, value FROM language ORDER BY name');
-	while($row = pg_fetch_row($result)) {
-		$languages .= '<option value="'. $row[1] .'">' . $row[0] . '</option>';
+	include_once('class/LanguageDAO.class.php');
+	$languageDAO = new LanguageDAO($countryDAO->getConnection());
+	$languagesArray = $languageDAO->findAll();
+	foreach($languagesArray as $language) {
+		$languages .= '<option value="'. $language->getValue() .'">' . $language->getName() . '</option>';
 	}
 
 	if(isset($_POST['name']) && !empty($_POST['name'])) {// && isset($_POST['photoPath']) && !empty($_POST['photoPath']) && isset($_POST['year']) && !empty($_POST['year']) && isset($_POST['latitude']) && !empty($_POST['latitude']) && isset($_POST['longitude']) && !empty($_POST['longitude']) && isset($_POST['description']) && !empty($_POST['description']) && isset($_POST['number']) && !empty($_POST['number']) && isset($_POST['street']) && !empty($_POST['steet']) && isset($_POST['city']) && !empty($_POST['city'])) {
