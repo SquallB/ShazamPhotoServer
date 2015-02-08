@@ -33,7 +33,7 @@ class CountryDAO extends DAO {
 	}
 
 	public function save($data) {
-		if (isset($data->id)) {
+		if($data->getId() !== null) {
 			return $this->update($data);
 		}
 
@@ -42,14 +42,15 @@ class CountryDAO extends DAO {
 		(name)
 		VALUES
 		(:name)
+		RETURNING id
 		');
 		$stmt->bindParam(':name', $data->getName());
-		return $stmt->execute();
+		$stmt->execute();
+		return $stmt->fetch()['id'];
 	}
 
 	public function update($data) {
-		$id = $data->getId();
-		if(!isset($id)) {
+		if($data->getId() === null) {
 			throw new \LogicException(
 				'Cannot update country that does not yet exist in the database.'
 			);
@@ -59,15 +60,16 @@ class CountryDAO extends DAO {
 		UPDATE country
 		SET name = :name
 		WHERE id = :id
+		RETURNING id
 		');
 		$stmt->bindParam(':name', $data->getName());
-		$stmt->bindParam(':id', $id);
-		return $stmt->execute(); 
+		$stmt->bindParam(':id', $data->getId());
+		$stmt->execute();
+		return $stmt->fetch()['id'];
 	}
 
 	public function delete ($data) {
-		$id = $data->getId();
-		if(!isset($id)) {
+		if($data->getId() === null) {
 			throw new \LogicException(
 				'Cannot delete country that does not yet exist in the database.'
 			);
@@ -77,7 +79,7 @@ class CountryDAO extends DAO {
 		DELETE FROM country
 		WHERE id = :id
 		');
-		$stmt->bindParam(':id', $id);
+		$stmt->bindParam(':id', $data->getId());
 		return $stmt->execute(); 
 	}
 }

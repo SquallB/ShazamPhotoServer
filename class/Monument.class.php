@@ -30,8 +30,20 @@ class Monument implements JsonSerializable {
 			$this->setYear($data['year']);
 			$this->setNbVisitors($data['nbvisitors']);
 			$this->setNbLikes($data['nblikes']);
-			$this->setLocalization(new Localization(array('id' => $data['l_id'], 'latitude' => $data['latitude'], 'longitude' => $data['longitude'])));
-			$this->setAddress(new Address(array('id' => $data['a_id'], 'number' => $data['number'], 'street' => $data['street'], 'ci_id' => $data['ci_id'], 'ci_name' =>  $data['ci_name'], 'co_id' => $data['co_id'], 'co_name' => $data['co_name'])));
+
+			if(isset($data['localization'])) {
+				$this->setLocalization($data['localization']);
+			}
+			else {
+				$this->setLocalization(new Localization(array('id' => $data['l_id'], 'latitude' => $data['latitude'], 'longitude' => $data['longitude'])));
+			}
+
+			if(isset($data['address'])) {
+				$this->setAddress($data['address']);
+			}
+			else {
+				$this->setAddress(new Address(array('id' => $data['a_id'], 'number' => $data['number'], 'street' => $data['street'], 'ci_id' => $data['ci_id'], 'ci_name' =>  $data['ci_name'], 'co_id' => $data['co_id'], 'co_name' => $data['co_name'])));
+			}
 		}
 	}	
 
