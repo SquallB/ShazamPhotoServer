@@ -1,6 +1,7 @@
 <?php
 
 include_once('Monument.class.php');
+include_once('MonumentCharacteristics.class.php');
 include_once('DAO.class.php');
 include_once('LocalizationDAO.class.php');
 include_once('AddressDAO.class.php');
@@ -50,17 +51,17 @@ class MonumentDAO extends DAO {
 		');
 		$stmt->execute();
 		$array = array();
+		$stmt2 = $this->getConnection()->prepare('
+			SELECT mc.id, mc.name, mc.description, l.id as l_id, l.name as l_name, l.value as l_value
+			FROM monument_characteristics mc INNER JOIN language l ON mc.language_id = l.id
+			WHERE mc.monument_id = :id
+		');
 		foreach($stmt->fetchAll() as $row) {
 			$monument = new Monument($row);
-			$stmt = $this->getConnection()->prepare('
-				SELECT mc.id, mc.name, mc.description, l.id as l_id, l.name as l_name, l.value as l_value
-				FROM monument_characteristics mc INNER JOIN language l ON mc.language_id = l.id
-				WHERE mc.monument_id = :id
-			');
-			$stmt->bindParam(':id', $monument->getId());
-			$stmt->execute();
+			$stmt2->bindParam(':id', $monument->getId());
+			$stmt2->execute();
 			$characteristics = array();
-			foreach($stmt->fetchAll() as $row) {
+			foreach($stmt2->fetchAll() as $row) {
 				$characteristics[] = new MonumentCharacteristics($row);
 			}
 			$monument->setCharacteristics($characteristics);
@@ -81,11 +82,11 @@ class MonumentDAO extends DAO {
 		$addressId = $addressDAO->save($data->getAddress());
 
 		$stmt = $this->getConnection()->prepare('
-		INSERT INTO monument
-		(photopath, year, nbvisitors, nblikes, localization_id, address_id)
-		VALUES
-		(:photopath, :year, :nbvisitors, :nblikes, :localization_id, :address_id)
-		RETURNING id
+			INSERT INTO monument
+			(photopath, year, nbvisitors, nblikes, localization_id, address_id)
+			VALUES
+			(:photopath, :year, :nbvisitors, :nblikes, :localization_id, :address_id)
+			RETURNING id
 		');
 		$stmt->bindParam(':photopath', $data->getPhotoPath());
 		$stmt->bindParam(':year', $data->getYear());
@@ -96,16 +97,15 @@ class MonumentDAO extends DAO {
 		$stmt->execute();
 		$monumentId = $stmt->fetch()['id'];
 
-		foreach($data->getCharacteristics() as $characteristic) {
-			$languageDAO = new LanguageDAO($this->getConnection());
-			$languageDAO->save($characteristic->getLanguage());
-			$languageId = $this->getConnection()->lastInsertId();
-			$stmt = $this->getConnection()->prepare('
+		$stmt = $this->getConnection()->prepare('
 			INSERT INTO monument_characteristics
 			(name, description, language_id, monument_id)
 			VALUES
-			(:name, :year, :description, :language_id, :monument_id)
-			');
+			(:name, :description, :language_id, :monument_id)
+		');
+		foreach($data->getCharacteristics() as $characteristic) {
+			$languageDAO = new LanguageDAO($this->getConnection());
+			$languageId = $languageDAO->save($characteristic->getLanguage());
 			$stmt->bindParam(':name', $characteristic->getName());
 			$stmt->bindParam(':description', $characteristic->getDescription());
 			$stmt->bindParam(':language_id', $languageId);
@@ -117,11 +117,75 @@ class MonumentDAO extends DAO {
 	}
 
 	public function update($data) {
+		if($data->getId() === null) {
+			throw new \LogicException(
+				'Cannot update monument that does not yet exist in the database.'
+			);
+		}
 
+		$localizationDAO = new LocalizationDAO($this->getConnection());
+		$localizationId = $localizationDAO->save($data->getLocalization());
+
+		$addressDAO = new AddressDAO($this->getConnection());
+		$addressId = $addressDAO->save($data->getAddress());
+
+		$stmt = $this->getConnection()->prepare('
+			UPDATE monument
+			SET photopath = :photoPath, year = :year, nbvisitors = :nbvisitors, nblikes = :nblikes, localization_id = :localization_id, address_id = :address_id
+			WHERE id = :id
+			RETURNING id
+		');
+		$stmt->bindParam(':photopath', $data->getPhotoPath());
+		$stmt->bindParam(':year', $data->getYear());
+		$stmt->bindParam(':nbvisitors', $data->getNbVisitors());
+		$stmt->bindParam(':nblikes', $data->getNbLikes());
+		$stmt->bindParam(':localization_id', $localizationId);
+		$stmt->bindParam(':address_id', $addressId);
+		$stmt->bindParam(':id', $data->getId());
+		$stmt->execute();
+		$monumentId = $stmt->fetch()['id'];
+
+		$stmt = $this->getConnection()->prepare('
+			INSERT INTO monument_characteristics
+			(name, description, language_id, monument_id)
+			VALUES
+			(:name, :year, :description, :language_id, :monument_id)
+		');
+		foreach($data->getCharacteristics() as $characteristic) {
+			$languageDAO = new LanguageDAO($this->getConnection());
+			$languageId = $languageDAO->save($characteristic->getLanguage());
+			$stmt->bindParam(':name', $characteristic->getName());
+			$stmt->bindParam(':description', $characteristic->getDescription());
+			$stmt->bindParam(':language_id', $languageId);
+			$stmt->bindParam(':monument_id', $monumentId);
+			$stmt->execute();
+		}
+
+		return $monumentId;
 	}
 
 	public function delete($data) {
+		if($data->getId() === null) {
+			throw new \LogicException(
+				'Cannot delete monument that does not yet exist in the database.'
+			);
+		}
 
+		$stmt = $this->getConnection()->prepare('
+			DELETE FROM monument_characteristics
+			WHERE id = :id
+		');
+		foreach($data->getCharacteristics() as $characteristic) {
+			$stmt->bindParam(':id', $characteristic->getId());
+			$stmt->execute();
+		}
+
+		$stmt = $this->getConnection()->prepare('
+			DELETE FROM monument
+			WHERE id = :id
+		');
+		$stmt->bindParam(':id', $data->getId());
+		return $stmt->execute(); 
 	}
 }
 

@@ -40,6 +40,8 @@
 		$city = new City(array('name' => $city, 'country' => $country));
 		$address = new Address(array('number' => $number, 'street' => $street, 'city' => $city));
 		$monument = new Monument(array('photopath' => $photoPath, 'year' => $year, 'nbvisitors' => 0, 'nblikes' => 0, 'address' => $address, 'localization' => $localization));
+		$characteristic = new MonumentCharacteristics(array('name' => $name, 'description' => $description, 'language' => $language));
+		$monument->setCharacteristics(array($characteristic));
 		$monumentDAO = new MonumentDAO($countryDAO->getConnection());
 		$monumentDAO->save($monument);
 	}

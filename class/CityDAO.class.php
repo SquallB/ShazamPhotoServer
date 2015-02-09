@@ -67,8 +67,7 @@ class CityDAO extends DAO {
 
 		$stmt = $this->getConnection()->prepare('
 		UPDATE city
-		SET name = :name
-		SET country_id = :country_id
+		SET name = :name, country_id = :country_id
 		WHERE id = :id
 		RETURNING id
 		');
