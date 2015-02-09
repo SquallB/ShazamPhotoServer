@@ -1,9 +1,6 @@
 <?php
 	$start = microtime(true);
 
-	include('pgconf.php');
-	$db = pg_connect($pgconf);
-
 	$countries = '';
 	include_once('class/CountryDAO.class.php');
 	$countryDAO = new CountryDAO();
@@ -45,8 +42,6 @@
 		$monumentDAO = new MonumentDAO($countryDAO->getConnection());
 		$monumentDAO->save($monument);
 	}
-
-	pg_close($db);
 
 ?>
 

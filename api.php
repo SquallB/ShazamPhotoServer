@@ -27,7 +27,17 @@
 			if(isset($column) && isset($argument)) {
 				include_once('class/MonumentDAO.class.php');
 				$dao = new MonumentDAO();
-				$json = $dao->findAll();
+				$monuments = $dao->findAll();
+
+				foreach($monuments as $monument) {
+					$found = false;
+					foreach($monument->getCharacteristics() as $characteristic) {
+						if ($found === false && strpos($characteristic->getName(), $argument) !== false) {
+						    $json[] = $monument;
+						    $found = true;
+						}
+					}
+				}
 			}
 		}
 	}
