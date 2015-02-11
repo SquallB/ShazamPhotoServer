@@ -13,7 +13,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Index</title>
+	<title>Ajout d'un pays</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
 </head>
 <body>
 	<h1>Ajout d'une pays</h1>

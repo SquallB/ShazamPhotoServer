@@ -1,5 +1,7 @@
 <?php
-	header("Content-Type: application/json");
+	header("Access-Control-Allow-Orgin: *");
+    header("Access-Control-Allow-Methods: *");
+    header("Content-Type: application/json");
 
 	$json = array();
 	$method = $_SERVER['REQUEST_METHOD'];

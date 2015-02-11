@@ -48,7 +48,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Index</title>
+	<title>Ajout d'un monument</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
 </head>
 <body>
 	<h1>Ajout d'un monument</h1>
@@ -63,7 +64,7 @@
 			<input type="text" name="photoPath" id="photoPath" />
 		</p>
 		<p>
-			<label for="year">Ann&eacute;e de construction :</label>
+			<label for="year">Année de construction :</label>
 			<input type="text" name="year" id="year" />
 		</p>
 		<p>
@@ -79,7 +80,7 @@
 			<input type="text" name="description" id="description" />
 		</p>
 		<p>
-			<label for="number">Num&eacute;ro :</label>
+			<label for="number">Numéro :</label>
 			<input type="text" name="number" id="number" />
 		</p>
 		<p>
