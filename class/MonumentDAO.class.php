@@ -70,6 +70,22 @@ class MonumentDAO extends DAO {
 		return $array;
 	}
 
+	public function searchByName($name) {
+		$name = '%'.$name.'%';
+		$array = array();
+		$stmt = $this->getConnection()->prepare('
+			SELECT DISTINCT monument_id
+			FROM monument_characteristics
+			WHERE name LIKE :name
+		');
+		$stmt->bindParam(':name', $name);
+		$stmt->execute();
+		foreach($stmt->fetchAll() as $row) {
+			$array[] = $this->find($row['monument_id']);
+		}
+		return $array;
+	}
+
 	public function save($data) {
 		if($data->getId() !== null) {
 			return $this->update($data);

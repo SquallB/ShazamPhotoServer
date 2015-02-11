@@ -2,6 +2,17 @@
 
 include_once('class/MonumentDAO.class.php');
 $dao = new MonumentDAO();
+
+if(isset($_GET['action']) && isset($_GET['id'])) {
+	if($_GET['action'] === 'delete') {
+		$id = pg_escape_string($_GET['id']);
+		$monument = $dao->find($id);
+		if($monument->getId() !== null) {
+			$dao->delete($monument);
+		}
+	}
+}
+
 $monuments = $dao->findAll();
 
 ?>
@@ -15,6 +26,10 @@ $monuments = $dao->findAll();
 <body>
 	<h1>Gestion des monuments</h1>
 
+	<p>
+		<a href="add_monument.php">Ajouter un monument</a>
+	</p>
+
 	<table>
 		<tr>
 			<th>ID</th>
@@ -24,6 +39,7 @@ $monuments = $dao->findAll();
 			<th>Adresse</th>
 			<th>Ville</th>
 			<th>Pays</th>
+			<th>Supprimer</th>
 		</tr>
 
 		<?php
@@ -41,6 +57,7 @@ $monuments = $dao->findAll();
 				  <td>' . $monument->getAddress()->getNumber() . ' ' . $monument->getAddress()->getStreet() . '</td>
 				  <td>' . $monument->getAddress()->getCity()->getName() . '</td>
 				  <td>' . $monument->getAddress()->getCity()->getCountry()->getName() . '</td>
+				  <td><a href="?action=delete&id=' . $monument->getId() . '">X</td>
 				 </tr>';
 		}
 

@@ -1,6 +1,4 @@
 <?php
-	$start = microtime(true);
-
 	$countries = '';
 	include_once('class/CountryDAO.class.php');
 	$countryDAO = new CountryDAO();
@@ -41,6 +39,8 @@
 		$monument->setCharacteristics(array($characteristic));
 		$monumentDAO = new MonumentDAO($countryDAO->getConnection());
 		$monumentDAO->save($monument);
+
+		header('Location: manage_monuments.php');
 	}
 
 ?>
@@ -108,13 +108,6 @@
 		<p>
 			<input type="submit" />
 		</p>
-
-		<?php
-			$end = microtime(true);
-			$diff = $end - $start;
-
-			echo '<p>' . $diff . '</p>';
-		?>
 	</form>
 </body>
 </html>
