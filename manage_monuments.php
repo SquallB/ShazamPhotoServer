@@ -34,6 +34,7 @@ $monuments = $dao->findAll();
 		<tr>
 			<th>ID</th>
 			<th>Name</th>
+			<th>Description</th>
 			<th>Année de construction</th>
 			<th>Localisation</th>
 			<th>Adresse</th>
@@ -47,11 +48,16 @@ $monuments = $dao->findAll();
 		foreach($monuments as $monument) {
 			echo '<tr>
 					<td>' . $monument->getId() . '</td>
-					<td>';
-					if(sizeof($monument->getCharacteristics()) > 0) {
-						echo $monument->getCharacteristics()[0]->getName();
+					<td><select>';
+					foreach($monument->getCharacteristics() as $characteristic) {
+						echo '<option>' . $characteristic->getName() . '</option>';
 					}
-			echo '</td>
+					echo '</select></td>
+					<td><select>';
+					foreach($monument->getCharacteristics() as $characteristic) {
+						echo '<option>' . $characteristic->getDescription() . '</option>';
+					}
+			echo '</select></td>
 				  <td>' . $monument->getYear() . '</td>
 				  <td>' . $monument->getLocalization()->getLatitude() . ', ' . $monument->getLocalization()->getLongitude() . '</td>
 				  <td>' . $monument->getAddress()->getNumber() . ' ' . $monument->getAddress()->getStreet() . '</td>

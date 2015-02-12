@@ -10,8 +10,8 @@ abstract class API {
 		$this->method = $method;
 
 		foreach($args as $key => $value) {
-			$key = htmlspecialchars($key);
-			$value = htmlspecialchars($value);
+			$key = pg_escape_string($key);
+			$value = pg_escape_string($value);
 
 			$this->args[$key] = $value;
 		}

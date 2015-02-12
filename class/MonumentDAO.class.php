@@ -76,7 +76,7 @@ class MonumentDAO extends DAO {
 		$stmt = $this->getConnection()->prepare('
 			SELECT DISTINCT monument_id
 			FROM monument_characteristics
-			WHERE name LIKE :name
+			WHERE LOWER(name) LIKE LOWER(:name)
 		');
 		$stmt->bindParam(':name', $name);
 		$stmt->execute();

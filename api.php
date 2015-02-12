@@ -19,5 +19,4 @@
 	$json = $api->processAPI();
 
 	echo $json;
-
 ?>
