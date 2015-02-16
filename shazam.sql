@@ -72,19 +72,23 @@ CREATE TABLE monument_has_monument_types
 	monument_types_id 	INTEGER NOT NULL REFERENCES monument_types (id)
 );
 
-CREATE TABLE list
+CREATE TABLE key_points
 (
 	id			serial	NOT NULL,
-	monument_id	serial	NOT NULL REFERENCES monument (id),
+	x			FLOAT	NOT NULL,
+	y			FLOAT 	NOT NULL,
+	size		FLOAT 	NOT NULL,
+	angle		FLOAT 	NOT NULL,
+	response	FLOAT	NOT NULL,
+	octave		INTEGER	NOT NULL,
+	class_id	INTEGER	NOT NULL,
+	list_id		INTEGER	NOT NULL REFERENCES list_key_points (id),
 	primary key (id)
 );
 
-CREATE TABLE points
+CREATE TABLE list_key_points
 (
-	id	serial	NOT NULL,
-	x	FLOAT	NOT NULL,
-	y	FLOAT NOT NULL,
-	value	FLOAT NOT NULL,
-	list_id	INTEGER	NOT NULL REFERENCES list (id),
+	id			serial	NOT NULL,
+	monument_id	serial	NOT NULL REFERENCES monument (id),
 	primary key (id)
 );

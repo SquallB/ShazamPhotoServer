@@ -16,29 +16,9 @@
 	}
 
 	if(!empty($_POST['name'])) {// && isset($_POST['photoPath']) && !empty($_POST['photoPath']) && isset($_POST['year']) && !empty($_POST['year']) && isset($_POST['latitude']) && !empty($_POST['latitude']) && isset($_POST['longitude']) && !empty($_POST['longitude']) && isset($_POST['description']) && !empty($_POST['description']) && isset($_POST['number']) && !empty($_POST['number']) && isset($_POST['street']) && !empty($_POST['steet']) && isset($_POST['city']) && !empty($_POST['city'])) {
-		$name = pg_escape_string($_POST['name']);
-		$photoPath = pg_escape_string($_POST['photoPath']);
-		$year = pg_escape_string($_POST['year']);
-		$latitude = pg_escape_string($_POST['latitude']);
-		$longitude = pg_escape_string($_POST['longitude']);
-		$description = pg_escape_string($_POST['description']);
-		$number = pg_escape_string($_POST['number']);
-		$street = pg_escape_string($_POST['street']);
-		$city = pg_escape_string($_POST['city']);
-		$countryId = pg_escape_string($_POST['country']);
-		$languageId = pg_escape_string($_POST['language']);
-
-		include_once('class/MonumentDAO.class.php');
-		$localization = new Localization(array('latitude' => $latitude, 'longitude' => $longitude));
-		$language = $languageDAO->find($languageId);
-		$country = $countryDAO->find($countryId);
-		$city = new City(array('name' => $city, 'country' => $country));
-		$address = new Address(array('number' => $number, 'street' => $street, 'city' => $city));
-		$monument = new Monument(array('photopath' => $photoPath, 'year' => $year, 'nbvisitors' => 0, 'nblikes' => 0, 'address' => $address, 'localization' => $localization));
-		$characteristic = new MonumentCharacteristics(array('name' => $name, 'description' => $description, 'language' => $language));
-		$monument->setCharacteristics(array($characteristic));
-		$monumentDAO = new MonumentDAO($countryDAO->getConnection());
-		$monumentDAO->save($monument);
+		include_once('class/MonumentAPI.class.php');
+		$monumentAPI = new MonumentAPI($_POST, 'POST');
+		$monumentAPI->processAPI();
 
 		header('Location: manage_monuments.php');
 	}

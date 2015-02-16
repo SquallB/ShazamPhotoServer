@@ -6,7 +6,7 @@ abstract class DAO {
 	public function __construct(PDO $connection = null)	{
 		$this->connection = $connection;
 		if ($this->connection === null) {
-			include_once('dbconfig.php');
+			include('dbconfig.php');
 			$this->connection = new PDO(
 				$type.':host='.$host.';port='.$port.';dbname='.$name,
 				$user,
