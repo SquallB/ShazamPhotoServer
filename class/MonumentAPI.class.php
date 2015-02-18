@@ -22,19 +22,9 @@ class MonumentAPI extends API {
 
 	public function searchByLocalization($latitude, $longitude, $offset) {
 		$dao = new MonumentDAO();
-		$monuments = $dao->findAll();
-		$returnArray = array();
+		$monuments = $dao->searchByLocalization($latitude, $longitude, $offset);
 
-		foreach($monuments as $monument) {
-			$localization = $monument->getLocalization();
-
-			if($localization->getLatitude() < ($latitude + $offset) && $localization->getLatitude() > ($latitude - $offset) && $localization->getLongitude() < ($longitude + $offset) && $localization->getLongitude() > ($longitude - $offset)) {
-				$returnArray[] = $monument;
-			}
-		}
-
-
-		return json_encode(array("Search" => $returnArray));
+		return json_encode(array("Search" => $monuments));
 	}
 
 	public function processAPI() {
@@ -69,6 +59,30 @@ class MonumentAPI extends API {
 			echo 'monument dao';
 			$monumentDAO = new MonumentDAO($languageDAO->getConnection());
 			$monumentDAO->save($monument);
+			$return = json_encode($monument);
+		}
+		else if($this->getMethod() === 'PUT') {
+			if(isset($args['id'])) {
+				$dao = new MonumentDAO();
+				$monument = $dao->find($args['id']);
+
+				if(isset($args['year'])) {
+					$monument->setYear($args['year']);
+				}
+
+				if(isset($args['number'])) {
+					$monument->getAddress()->setNumber($args['number']);
+				}
+
+				if(isset($args['street'])) {
+					$monument->getAddress()->setStreet($args['street']);
+				}
+
+				$dao->save($monument);
+			}
+		}
+		else if($this->getMethod() === 'DELETE') {
+
 		}
 
 		return $return;

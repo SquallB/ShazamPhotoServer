@@ -6,10 +6,53 @@ include_once('DAO.class.php');
 include_once('LocalizationDAO.class.php');
 include_once('AddressDAO.class.php');
 include_once('LanguageDAO.class.php');
+include_once('ListKeyPoints.class.php');
 
 class MonumentDAO extends DAO {
 	public function __constrct(PDO $connection = null) {
 		parent::__constrct($connection);
+	}
+
+	private function getCharacteristics($monumentId) {
+		$stmt = $this->getConnection()->prepare('
+			SELECT mc.id, mc.name, mc.description, l.id as l_id, l.name as l_name, l.value as l_value
+			FROM monument_characteristics mc
+			INNER JOIN language l ON mc.language_id = l.id
+			WHERE mc.monument_id = :id
+		');
+		$stmt->bindParam(':id', $monumentId);
+		$stmt->execute();
+		$characteristics = array();
+		foreach($stmt->fetchAll() as $row) {
+			$characteristics[] = new MonumentCharacteristics($row);
+		}
+		return $characteristics;
+	}
+
+	private function getListKeyPoints($monumentId) {
+		$lists = array();
+		$stmt = $this->getConnection()->prepare('
+			SELECT id
+			FROM list_key_points
+			WHERE monument_id = :id
+		');
+		$stmt->bindParam(':id', $monumentId);
+		$stmt->execute();
+		$stmt2 = $this->getConnection()->prepare('
+			SELECT id, x, y, size, angle, response, octave, class_id
+			FROM key_points
+			WHERE list_id = :id
+		');
+		foreach($stmt->fetchAll() as $listId) {
+			$keyPoints = array();
+			$stmt2->bindParam(':id', $listId['id']);
+			$stmt2->execute();
+			foreach($stmt2->fetchAll as $row) {
+				$keyPoints[] = new KeyPoint($row);
+			}
+			$lists[] = new ListKeyPoints(array('id' => $listId, 'keyPoints' => $keyPoints));
+		}
+		return $lists;
 	}
 
 	public function find($id) {
@@ -25,18 +68,10 @@ class MonumentDAO extends DAO {
 		$stmt->bindParam(':id', $id);
 		$stmt->execute();
 		$monument = new Monument($stmt->fetch());
-		$stmt = $this->getConnection()->prepare('
-			SELECT mc.id, mc.name, mc.description, l.id as l_id, l.name as l_name, l.value as l_value
-			FROM monument_characteristics mc INNER JOIN language l ON mc.language_id = l.id
-			WHERE mc.monument_id = :id
-		');
-		$stmt->bindParam(':id', $id);
-		$stmt->execute();
-		$characteristics = array();
-		foreach($stmt->fetchAll() as $row) {
-			$characteristics[] = new MonumentCharacteristics($row);
-		}
-		$monument->setCharacteristics($characteristics);
+
+		$monument->setCharacteristics($this->getCharacteristics($id));
+		$monument->setListsKeyPoints($this->getListKeyPoints($id));
+
 		return $monument;
 	}
 
@@ -51,20 +86,11 @@ class MonumentDAO extends DAO {
 		');
 		$stmt->execute();
 		$array = array();
-		$stmt2 = $this->getConnection()->prepare('
-			SELECT mc.id, mc.name, mc.description, l.id as l_id, l.name as l_name, l.value as l_value
-			FROM monument_characteristics mc INNER JOIN language l ON mc.language_id = l.id
-			WHERE mc.monument_id = :id
-		');
+
 		foreach($stmt->fetchAll() as $row) {
 			$monument = new Monument($row);
-			$stmt2->bindParam(':id', $monument->getId());
-			$stmt2->execute();
-			$characteristics = array();
-			foreach($stmt2->fetchAll() as $row) {
-				$characteristics[] = new MonumentCharacteristics($row);
-			}
-			$monument->setCharacteristics($characteristics);
+			$monument->setCharacteristics($this->getCharacteristics($monument->getId()));
+			$monument->setListsKeyPoints($this->getListKeyPoints($monument->getId()));
 			$array[] = $monument;
 		}
 		return $array;
@@ -82,6 +108,29 @@ class MonumentDAO extends DAO {
 		$stmt->execute();
 		foreach($stmt->fetchAll() as $row) {
 			$array[] = $this->find($row['monument_id']);
+		}
+		return $array;
+	}
+
+	public function searchByLocalization($latitude, $longitude, $offset) {
+		$array = array();
+		$minLatitude = $latitude - $offset;
+		$maxLatitude = $latitude + $offset;
+		$minLongitude = $longitude - $offset;
+		$maxLongitude = $longitude + $offset;
+		$stmt = $this->getConnection()->prepare('
+			SELECT DISTINCT m.id
+			FROM monument m
+			INNER JOIN localization l ON m.localization_id = l.id
+			WHERE l.latitude > (:minlatitude) AND l.latitude < (:maxlatitude) AND l.longitude > (:minlongitude) AND l.longitude < (:maxlongitude)
+		');
+		$stmt->bindParam(':minlatitude', $minLatitude);
+		$stmt->bindParam(':maxlatitude', $maxLatitude);
+		$stmt->bindParam(':minlongitude', $minLongitude);
+		$stmt->bindParam(':maxlongitude', $maxLongitude);
+		$stmt->execute();
+		foreach($stmt->fetchAll() as $row) {
+			$array[] = $this->find($row['id']);
 		}
 		return $array;
 	}

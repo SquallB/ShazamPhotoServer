@@ -12,6 +12,7 @@ class Monument implements JsonSerializable {
 	private $nbLikes;
 	private $localization;
 	private $address;
+	private $listsKeyPoints;
 
 	public function __construct($data = null) {
 		if (is_array($data)) {
@@ -43,6 +44,13 @@ class Monument implements JsonSerializable {
 			}
 			else {
 				$this->setAddress(new Address(array('id' => $data['a_id'], 'number' => $data['number'], 'street' => $data['street'], 'ci_id' => $data['ci_id'], 'ci_name' =>  $data['ci_name'], 'co_id' => $data['co_id'], 'co_name' => $data['co_name'])));
+			}
+
+			if(isset($data['listsKeyPoints'])) {
+				$this->setCharacteristics($data['listsKeyPoints']);
+			}
+			else {
+				$this->setCharacteristics(array());
 			}
 		}
 	}	
@@ -127,6 +135,16 @@ class Monument implements JsonSerializable {
 		}
  	}
 
+ 	public function getListsKeyPoints() {
+    	return $this->listsKeyPoints;
+    }
+
+    public function setListsKeyPoints($listsKeyPoints) {
+    	if(is_array($listsKeyPoints)) {
+    		$this->listsKeyPoints = $listsKeyPoints;
+    	}
+    }
+
  	public function jsonSerialize() {
         return [
             'characteristics' => $this->getCharacteristics(),
@@ -135,7 +153,8 @@ class Monument implements JsonSerializable {
             'nbVisitors' => $this->getNbVisitors(),
             'nbLikes' => $this->getNbLikes(),
             'localization' => $this->getLocalization(),
-            'address' => $this->getAddress()
+            'address' => $this->getAddress(),
+            'listsKeyPoints' => $this->getListsKeyPoints()
         ];
     }
 }

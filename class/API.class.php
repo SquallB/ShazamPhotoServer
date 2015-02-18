@@ -6,17 +6,9 @@ abstract class API {
 	private $returnType;
 
 	public function __construct($args, $method, $returnType = 0) {
-		$this->args = array();
-		$this->method = $method;
-
-		foreach($args as $key => $value) {
-			$key = pg_escape_string($key);
-			$value = pg_escape_string($value);
-
-			$this->args[$key] = $value;
-		}
-
-		$this->returnType = 0;
+		$this->setArgs($args);
+		$this->setMethod($method);
+		$this->setReturnType($returnType);
 	}
 
 	public function getArgs() {
@@ -25,7 +17,12 @@ abstract class API {
 
 	public function setArgs($args) {
 		if(is_array($args)) {
-			$this->args = $args;
+			$this->args = array();
+			foreach($args as $key => $value) {
+				$key = pg_escape_string($key);
+				$value = pg_escape_string($value);
+				$this->args[$key] = $value;
+			}
 		}
 	}
 
