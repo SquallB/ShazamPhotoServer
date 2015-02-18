@@ -72,6 +72,13 @@ CREATE TABLE monument_has_monument_types
 	monument_types_id 	INTEGER NOT NULL REFERENCES monument_types (id)
 );
 
+CREATE TABLE list_key_points
+(
+	id			serial	NOT NULL,
+	monument_id	serial	NOT NULL REFERENCES monument (id),
+	primary key (id)
+);
+
 CREATE TABLE key_points
 (
 	id			serial	NOT NULL,
@@ -83,12 +90,5 @@ CREATE TABLE key_points
 	octave		INTEGER	NOT NULL,
 	class_id	INTEGER	NOT NULL,
 	list_id		INTEGER	NOT NULL REFERENCES list_key_points (id),
-	primary key (id)
-);
-
-CREATE TABLE list_key_points
-(
-	id			serial	NOT NULL,
-	monument_id	serial	NOT NULL REFERENCES monument (id),
 	primary key (id)
 );

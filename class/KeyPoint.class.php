@@ -2,7 +2,7 @@
 
 class KeyPoint implements JsonSerializable {
 	private $id;
-	private $x
+	private $x;
 	private $y;
 	private $size;
 	private $angle;
@@ -41,7 +41,7 @@ class KeyPoint implements JsonSerializable {
 	}
 
 	public function setX($x) {
-		if(is_numeric($x) {
+		if(is_numeric($x)) {
 			$this->x = $x;
 		}
 	}
@@ -108,13 +108,13 @@ class KeyPoint implements JsonSerializable {
 
 	public function jsonSerialize() {
         return [
-       		'x' => $this->getX();
-			'y' => $this->getY();
-			'size' => $this->getSize();
-			'angle' => $this->getAngle();
-			'response' => $this->getResponse();
-			'octave' => $this->getOctave();
-			'class_id' => $this->getClassId();
+       		'x' => $this->getX(),
+			'y' => $this->getY(),
+			'size' => $this->getSize(),
+			'angle' => $this->getAngle(),
+			'response' => $this->getResponse(),
+			'octave' => $this->getOctave(),
+			'class_id' => $this->getClassId()
         ];
     }
 }

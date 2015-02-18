@@ -7,6 +7,7 @@ include_once('LocalizationDAO.class.php');
 include_once('AddressDAO.class.php');
 include_once('LanguageDAO.class.php');
 include_once('ListKeyPoints.class.php');
+include_once('KeyPoint.class.php');
 
 class MonumentDAO extends DAO {
 	public function __constrct(PDO $connection = null) {
@@ -47,7 +48,7 @@ class MonumentDAO extends DAO {
 			$keyPoints = array();
 			$stmt2->bindParam(':id', $listId['id']);
 			$stmt2->execute();
-			foreach($stmt2->fetchAll as $row) {
+			foreach($stmt2->fetchAll() as $row) {
 				$keyPoints[] = new KeyPoint($row);
 			}
 			$lists[] = new ListKeyPoints(array('id' => $listId, 'keyPoints' => $keyPoints));
@@ -178,6 +179,37 @@ class MonumentDAO extends DAO {
 			$stmt->execute();
 		}
 
+		$stmt = $this->getConnection()->prepare('
+			INSERT INTO list_key_points
+			(monument_id)
+			VALUES
+			(:monument_id)
+			RETURNING id
+		');
+		foreach($data->getListsKeyPoints() as $list) {
+			$stmt->bindParam(':monument_id', $monumentId);
+			$stmt->execute();
+			$listId = $stmt->fetch()['id'];
+
+			$stmt = $this->getConnection()->prepare('
+				INSERT INTO key_points
+				(x, y, size, angle, response, octave, class_id, list_id)
+				VALUES
+				(:x, :y, :size, :angle, :response, :octave, :class_id, :list_id)
+			');
+			foreach($list->getKeyPoints() as $keyPoint) {
+				$stmt->bindParam(':x', $keyPoint->getX());
+				$stmt->bindParam(':y', $keyPoint->getY());
+				$stmt->bindParam(':size', $keyPoint->getSize());
+				$stmt->bindParam(':angle', $keyPoint->getAngle());
+				$stmt->bindParam(':response', $keyPoint->getResponse());
+				$stmt->bindParam(':octave', $keyPoint->getOctave());
+				$stmt->bindParam(':class_id', $keyPoint->getClassId());
+				$stmt->bindParam(':list_id', $listId);
+				$stmt->execute();
+			}
+		}
+
 		return $monumentId;
 	}
 
@@ -196,7 +228,7 @@ class MonumentDAO extends DAO {
 
 		$stmt = $this->getConnection()->prepare('
 			UPDATE monument
-			SET photopath = :photoPath, year = :year, nbvisitors = :nbvisitors, nblikes = :nblikes, localization_id = :localization_id, address_id = :address_id
+			SET photopath = :photopath, year = :year, nbvisitors = :nbvisitors, nblikes = :nblikes, localization_id = :localization_id, address_id = :address_id
 			WHERE id = :id
 			RETURNING id
 		');
@@ -210,13 +242,25 @@ class MonumentDAO extends DAO {
 		$stmt->execute();
 		$monumentId = $stmt->fetch()['id'];
 
-		$stmt = $this->getConnection()->prepare('
+		$stmt1 = $this->getConnection()->prepare('
 			INSERT INTO monument_characteristics
 			(name, description, language_id, monument_id)
 			VALUES
 			(:name, :year, :description, :language_id, :monument_id)
 		');
+		$stmt2 = $this->getConnection()->prepare('
+			UPDATE monument_characteristics
+			SET name = :name, description = :description, language_id = :language_id, monument_id = :monument_id
+			WHERE id = :id
+		');
 		foreach($data->getCharacteristics() as $characteristic) {
+			if($characteristic->getId() !== null) {
+				$stmt = $stmt2;
+				$stmt->bindParam(':id', $characteristic->getId());
+			}
+			else {
+				$stmt = $stmt1;
+			}
 			$languageDAO = new LanguageDAO($this->getConnection());
 			$languageId = $languageDAO->save($characteristic->getLanguage());
 			$stmt->bindParam(':name', $characteristic->getName());
@@ -224,6 +268,62 @@ class MonumentDAO extends DAO {
 			$stmt->bindParam(':language_id', $languageId);
 			$stmt->bindParam(':monument_id', $monumentId);
 			$stmt->execute();
+		}
+
+		$stmt1 = $this->getConnection()->prepare('
+			INSERT INTO list_key_points
+			(monument_id)
+			VALUES
+			(:monument_id)
+			RETURNING id
+		');
+		$stmt2 = $this->getConnection()->prepare('
+			UPDATE list_key_points
+			SET monument_id = :monument_id
+			WHERE id = :id
+			RETURNING id
+		');
+		foreach($data->getListsKeyPoints() as $list) {
+			if($list->getId() !== null) {
+				$stmt = $stmt2;
+				$stmt->bindParam(':id', $list->getId());
+			}
+			else {
+				$stmt = $stmt1;
+			}
+			$stmt->bindParam(':monument_id', $monumentId);
+			$stmt->execute();
+			$listId = $stmt->fetch()['id'];
+
+			$stmt1 = $this->getConnection()->prepare('
+				INSERT INTO key_points
+				(x, y, size, angle, response, octave, class_id, list_id)
+				VALUES
+				(:x, :y, :size, :angle, :response, :octave, :class_id, :list_id)
+			');
+			$stmt2 = $this->getConnection()->prepare('
+				UPDATE key_points
+				SET x = :x, y = :y, size = :size, angle = :angle, response = :response, octave = :octave, class_id = :class_id, list_id = :listId
+				WHERE id = :id
+			');
+			foreach($list->getKeyPoints() as $keyPoint) {
+				if($keyPoint->getId() !== null) {
+					$stmt = $stmt2;
+					$stmt->bindParam(':id', $keyPoint->getId());
+				}
+				else {
+					$stmt = $stmt1;
+				}
+				$stmt->bindParam(':x', $keyPoint->getX());
+				$stmt->bindParam(':y', $keyPoint->getY());
+				$stmt->bindParam(':size', $keyPoint->getSize());
+				$stmt->bindParam(':angle', $keyPoint->getAngle());
+				$stmt->bindParam(':response', $keyPoint->getResponse());
+				$stmt->bindParam(':octave', $keyPoint->getOctave());
+				$stmt->bindParam(':class_id', $keyPoint->getClassId());
+				$stmt->bindParam(':list_id', $listId);
+				$stmt->execute();
+			}
 		}
 
 		return $monumentId;

@@ -56,7 +56,6 @@ class MonumentAPI extends API {
 			$monument = new Monument(array('photopath' => $args['photoPath'], 'year' => $args['year'], 'nbvisitors' => 0, 'nblikes' => 0, 'address' => $address, 'localization' => $localization));
 			$characteristic = new MonumentCharacteristics(array('name' => $args['name'], 'description' => $args['description'], 'language' => $language));
 			$monument->setCharacteristics(array($characteristic));
-			echo 'monument dao';
 			$monumentDAO = new MonumentDAO($languageDAO->getConnection());
 			$monumentDAO->save($monument);
 			$return = json_encode($monument);

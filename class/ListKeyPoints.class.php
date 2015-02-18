@@ -1,6 +1,6 @@
 <?php
 
-class ListKeyPoints {
+class ListKeyPoints implements JsonSerializable {
 	private $id;
 	private $keyPoints;
 

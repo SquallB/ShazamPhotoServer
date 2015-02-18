@@ -70,7 +70,7 @@ class AddressDAO extends DAO {
 		$cityId = $cityDAO->save($data->getCity());
 
 		$stmt = $this->getConnection()->prepare('
-		UPDATE country
+		UPDATE address
 		SET number = :number, street = :street, city_id = :city_id
 		WHERE id = :id
 		RETURNING id
