@@ -46,19 +46,12 @@ class MonumentAPI extends API {
 			}
 		}
 		else if($this->getMethod() === 'POST') {
-			$localization = new Localization(array('latitude' => $args['latitude'], 'longitude' => $args['longitude']));
-			$languageDAO = new LanguageDAO();
-			$language = $languageDAO->find($args['language']);
-			$countryDAO = new CountryDAO($languageDAO->getConnection());
-			$country = $countryDAO->find($args['country']);
-			$city = new City(array('name' => $args['city'], 'country' => $country));
-			$address = new Address(array('number' => $args['number'], 'street' => $args['street'], 'city' => $city));
-			$monument = new Monument(array('photopath' => $args['photoPath'], 'year' => $args['year'], 'nbvisitors' => 0, 'nblikes' => 0, 'address' => $address, 'localization' => $localization));
-			$characteristic = new MonumentCharacteristics(array('name' => $args['name'], 'description' => $args['description'], 'language' => $language));
-			$monument->setCharacteristics(array($characteristic));
-			$monumentDAO = new MonumentDAO($languageDAO->getConnection());
-			$monumentDAO->save($monument);
-			$return = json_encode($monument);
+			if(isset($args['monument'])) {
+				$monument = new Monument($args['monument']);
+				$monumentDAO = new MonumentDAO($languageDAO->getConnection());
+				$monumentDAO->save($monument);
+				$return = json_encode($monument);
+			}
 		}
 		else if($this->getMethod() === 'PUT') {
 			if(isset($args['id'])) {

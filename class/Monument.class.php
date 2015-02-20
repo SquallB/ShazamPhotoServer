@@ -148,13 +148,13 @@ class Monument implements JsonSerializable {
  	public function jsonSerialize() {
         return [
             'characteristics' => $this->getCharacteristics(),
-            'photoPath' => $this->getPhotoPath(),
+            'photopath' => $this->getPhotoPath(),
             'year' => $this->getYear(),
-            'nbVisitors' => $this->getNbVisitors(),
-            'nbLikes' => $this->getNbLikes(),
+            'nbvisitors' => $this->getNbVisitors(),
+            'nblikes' => $this->getNbLikes(),
             'localization' => $this->getLocalization(),
             'address' => $this->getAddress(),
-            'listsKeyPoints' => $this->getListsKeyPoints()
+            'listskeypoints' => $this->getListsKeyPoints()
         ];
     }
 }
