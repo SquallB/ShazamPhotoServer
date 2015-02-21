@@ -18,11 +18,17 @@ class MonumentCharacteristics implements JsonSerializable {
 			$this->setDescription($data['description']);
 
 			if(isset($data['language'])) {
-				$this->setLanguage($data['language']);
+				if(is_array($data['language'])) {
+					$language = new Language($data['language']);
+				}
+				else {
+					$language = $data['language'];
+				}
 			}
 			else {
-				$this->setLanguage(new Language(array('id' => $data['l_id'], 'name' => $data['l_name'], 'value' => $data['l_value'])));
+				$language = new Language(array('id' => $data['l_id'], 'name' => $data['l_name'], 'value' => $data['l_value']));
 			}
+			$this->setLanguage($language);
 		}
 	}	
 

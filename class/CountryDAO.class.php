@@ -38,15 +38,33 @@ class CountryDAO extends DAO {
 		}
 
 		$stmt = $this->getConnection()->prepare('
-		INSERT INTO country
-		(name)
-		VALUES
-		(:name)
-		RETURNING id
+			SELECT id
+			FROM country
+			WHERE name=:name
 		');
 		$stmt->bindParam(':name', $data->getName());
 		$stmt->execute();
-		return $stmt->fetch()['id'];
+		if($row = $stmt->fetch()) {
+			$id = $row['id'];
+		}
+		else {
+			$stmt = $this->getConnection()->prepare('
+				INSERT INTO country
+				(name)
+				VALUES
+				(:name)
+				WHERE NOT EXISTS (
+				    SELECT id FROM country
+				    WHERE name=:name
+			    )    
+				RETURNING id
+				');
+			$stmt->bindParam(':name', $data->getName());
+			$stmt->execute();
+			$id = $stmt->fetch()['id'];
+		}
+
+		return $id;
 	}
 
 	public function update($data) {
@@ -57,10 +75,10 @@ class CountryDAO extends DAO {
 		}
 
 		$stmt = $this->getConnection()->prepare('
-		UPDATE country
-		SET name = :name
-		WHERE id = :id
-		RETURNING id
+			UPDATE country
+			SET name = :name
+			WHERE id = :id
+			RETURNING id
 		');
 		$stmt->bindParam(':name', $data->getName());
 		$stmt->bindParam(':id', $data->getId());
@@ -76,8 +94,8 @@ class CountryDAO extends DAO {
 		}
 
 		$stmt = $this->getConnection()->prepare('
-		DELETE FROM country
-		WHERE id = :id
+			DELETE FROM country
+			WHERE id = :id
 		');
 		$stmt->bindParam(':id', $data->getId());
 		return $stmt->execute(); 

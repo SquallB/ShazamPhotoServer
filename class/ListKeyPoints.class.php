@@ -10,12 +10,13 @@ class ListKeyPoints implements JsonSerializable {
 				$this->setId($data['id']);
 			}
 
-			if(isset($data['keyPoints'])) {
-				$this->setKeyPoints($data['keyPoints']);
+			$keyPoints = array();
+			if(isset($data['keypoints']) && is_array($data['keypoints'])) {
+				foreach($data['keypoints'] as $keyPoint) {
+					$keyPoints[] = new KeyPoint($keyPoint);
+				}
 			}
-			else {
-				$this->setKeyPoints(array());
-			}
+			$this->setKeyPoints($keyPoints);
 		}
 	}
 
@@ -41,7 +42,7 @@ class ListKeyPoints implements JsonSerializable {
 
 	public function jsonSerialize() {
         return [
-            'keyPoints' => $this->getKeyPoints()
+            'keypoints' => $this->getKeyPoints()
         ];
     }
 }

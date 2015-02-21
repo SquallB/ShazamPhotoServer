@@ -18,11 +18,17 @@ class Address implements JsonSerializable {
 			$this->setStreet($data['street']);
 			
 			if(isset($data['city'])) {
-				$this->setCity($data['city']);
+				if(is_array($data['city'])) {
+					$city = new City($data['city']);
+				}
+				else {
+					$city = $data['city'];
+				}
 			}
 			else {
-				$this->setCity(new City(array('id' => $data['ci_id'], 'name' => $data['ci_name'], 'co_id' => $data['co_id'], 'co_name' => $data['co_name'])));
+				$city = new City(array('id' => $data['ci_id'], 'name' => $data['ci_name'], 'co_id' => $data['co_id'], 'co_name' => $data['co_name']));
 			}
+			$this->setCity($city);
 		}
 	}	
 

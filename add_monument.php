@@ -15,10 +15,23 @@
 		$languages .= '<option value="'. $language->getId() .'">' . $language->getName() . '</option>';
 	}
 
+	include_once('class/MonumentDAO.class.php');
 	if(!empty($_POST['name'])) {// && isset($_POST['photoPath']) && !empty($_POST['photoPath']) && isset($_POST['year']) && !empty($_POST['year']) && isset($_POST['latitude']) && !empty($_POST['latitude']) && isset($_POST['longitude']) && !empty($_POST['longitude']) && isset($_POST['description']) && !empty($_POST['description']) && isset($_POST['number']) && !empty($_POST['number']) && isset($_POST['street']) && !empty($_POST['steet']) && isset($_POST['city']) && !empty($_POST['city'])) {
-		include_once('class/MonumentAPI.class.php');
-		$monumentAPI = new MonumentAPI($_POST, 'POST');
-		$monumentAPI->processAPI();
+		$args = array();
+		foreach($_POST as $key => $arg) {
+			$args[$key] = pg_escape_string($arg);
+		}
+
+		$localization = new Localization(array('latitude' => $args['latitude'], 'longitude' => $args['longitude']));
+		$language = $languageDAO->find($args['language']);
+		$country = $countryDAO->find($args['country']);
+		$city = new City(array('name' => $args['city'], 'country' => $country));
+		$address = new Address(array('number' => $args['number'], 'street' => $args['street'], 'city' => $city));
+		$monument = new Monument(array('photopath' => $args['photopath'], 'year' => $args['year'], 'nbvisitors' => 0, 'nblikes' => 0, 'address' => $address, 'localization' => $localization));
+		$characteristic = new MonumentCharacteristics(array('name' => $args['name'], 'description' => $args['description'], 'language' => $language));
+		$monument->setCharacteristics(array($characteristic));
+		$monumentDAO = new MonumentDAO($languageDAO->getConnection());
+		$monumentDAO->save($monument);
 
 		header('Location: manage_monuments.php');
 	}
@@ -40,8 +53,8 @@
 			<input type="text" name="name" id="name" />
 		</p>
 		<p>
-			<label for="photoPath">Chemin de la photo :</label>
-			<input type="text" name="photoPath" id="photoPath" />
+			<label for="photopath">Chemin de la photo :</label>
+			<input type="text" name="photopath" id="photopath" />
 		</p>
 		<p>
 			<label for="year">Année de construction :</label>

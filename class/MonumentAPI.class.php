@@ -47,8 +47,8 @@ class MonumentAPI extends API {
 		}
 		else if($this->getMethod() === 'POST') {
 			if(isset($args['monument'])) {
-				$monument = new Monument($args['monument']);
-				$monumentDAO = new MonumentDAO($languageDAO->getConnection());
+				$monument = new Monument(json_decode($args['monument'], true));
+				$monumentDAO = new MonumentDAO();
 				$monumentDAO->save($monument);
 				$return = json_encode($monument);
 			}

@@ -38,16 +38,31 @@ class LanguageDAO extends DAO {
 		}
 
 		$stmt = $this->getConnection()->prepare('
-		INSERT INTO language
-		(name, value)
-		VALUES
-		(:name, :value)
-		RETURNING id
+			SELECT id
+			FROM language
+			WHERE name=:name AND value=:value
 		');
 		$stmt->bindParam(':name', $data->getName());
 		$stmt->bindParam(':value', $data->getValue());
 		$stmt->execute();
-		return $stmt->fetch()['id'];
+		if($row = $stmt->fetch()) {
+			$id = $row['id'];
+		}
+		else {
+			$stmt = $this->getConnection()->prepare('
+			INSERT INTO language
+			(name, value)
+			VALUES
+			(:name, :value)
+			RETURNING id
+			');
+			$stmt->bindParam(':name', $data->getName());
+			$stmt->bindParam(':value', $data->getValue());
+			$stmt->execute();
+
+			$id = $stmt->fetch()['id'];
+		}
+			return $id;
 	}
 
 	public function update($data) {

@@ -45,13 +45,10 @@ class MonumentDAO extends DAO {
 			WHERE list_id = :id
 		');
 		foreach($stmt->fetchAll() as $listId) {
-			$keyPoints = array();
 			$stmt2->bindParam(':id', $listId['id']);
 			$stmt2->execute();
-			foreach($stmt2->fetchAll() as $row) {
-				$keyPoints[] = new KeyPoint($row);
-			}
-			$lists[] = new ListKeyPoints(array('id' => $listId, 'keyPoints' => $keyPoints));
+			$keyPoints = $stmt2->fetchAll();
+			$lists[] = new ListKeyPoints(array('id' => $listId['id'], 'keypoints' => $keyPoints));
 		}
 		return $lists;
 	}
@@ -72,7 +69,7 @@ class MonumentDAO extends DAO {
 
 		$monument->setCharacteristics($this->getCharacteristics($id));
 		$monument->setListsKeyPoints($this->getListKeyPoints($id));
-
+		
 		return $monument;
 	}
 
@@ -345,6 +342,22 @@ class MonumentDAO extends DAO {
 			$stmt->execute();
 		}
 
+		$stmt = $this->getConnection()->prepare('
+			DELETE FROM list_key_points
+			WHERE id = :id
+		');
+		foreach($data->getListsKeyPoints() as $list) {
+			$stmt2 = $this->getConnection()->prepare('
+				DELETE FROM key_points
+				WHERE id = :id
+			');
+			foreach($list->getKeyPoints() as $keyPoint) {
+				$stmt2->bindParam(':id', $keyPoint->getId());
+				$stmt2->execute();
+			}
+			$stmt->bindParam(':id', $list->getId());
+			$stmt->execute();
+		}
 		$stmt = $this->getConnection()->prepare('
 			DELETE FROM monument
 			WHERE id = :id

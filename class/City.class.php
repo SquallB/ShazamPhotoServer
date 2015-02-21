@@ -16,11 +16,17 @@ class City implements JsonSerializable {
 			$this->setName($data['name']);
 
 			if(isset($data['country'])) {
-				$this->setCountry($data['country']);
+				if(is_array($data['country'])) {
+					$country = new Country($data['country']);
+				}
+				else {
+					$country = $data['country'];
+				}
 			}
 			else {
-				$this->setCountry(new Country(array('id' => $data['co_id'], 'name' => $data['co_name'])));
+				$country = new Country(array('id' => $data['co_id'], 'name' => $data['co_name']));
 			}
+			$this->setCountry($country);
 		}
 	}	
 

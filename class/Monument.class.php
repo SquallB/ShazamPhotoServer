@@ -20,12 +20,13 @@ class Monument implements JsonSerializable {
 				$this->setId($data['id']);
 			}
 			
-			if(isset($data['characteristics'])) {
-				$this->setCharacteristics($data['characteristics']);
+			$characteristics = array();
+			if(isset($data['characteristics']) && is_array($data['characteristics'])) {
+				foreach($data['characteristics'] as $characteristic) {
+					$characteristics[] = new MonumentCharacteristics($characteristic);
+				}
 			}
-			else {
-				$this->setCharacteristics(array());
-			}
+			$this->setCharacteristics($characteristics);
 
 			$this->setPhotoPath($data['photopath']);
 			$this->setYear($data['year']);
@@ -33,25 +34,39 @@ class Monument implements JsonSerializable {
 			$this->setNbLikes($data['nblikes']);
 
 			if(isset($data['localization'])) {
-				$this->setLocalization($data['localization']);
+				if(is_array($data['localization'])) {
+					$localization = new Localization($data['localization']);
+				}
+				else {
+					$localization = $data['localization'];
+				}
+
 			}
 			else {
-				$this->setLocalization(new Localization(array('id' => $data['l_id'], 'latitude' => $data['latitude'], 'longitude' => $data['longitude'])));
+				$localization = new Localization(array('id' => $data['l_id'], 'latitude' => $data['latitude'], 'longitude' => $data['longitude']));
 			}
+			$this->setLocalization($localization);
 
 			if(isset($data['address'])) {
-				$this->setAddress($data['address']);
+				if(is_array($data['address'])) {
+					$address = new Address($data['address']);
+				}
+				else {
+					$address = $data['address'];
+				}
 			}
 			else {
-				$this->setAddress(new Address(array('id' => $data['a_id'], 'number' => $data['number'], 'street' => $data['street'], 'ci_id' => $data['ci_id'], 'ci_name' =>  $data['ci_name'], 'co_id' => $data['co_id'], 'co_name' => $data['co_name'])));
+				$address = new Address(array('id' => $data['a_id'], 'number' => $data['number'], 'street' => $data['street'], 'ci_id' => $data['ci_id'], 'ci_name' =>  $data['ci_name'], 'co_id' => $data['co_id'], 'co_name' => $data['co_name']));
 			}
+			$this->setAddress($address);
 
-			if(isset($data['listsKeyPoints'])) {
-				$this->setCharacteristics($data['listsKeyPoints']);
+			$listsKeyPoints = array();
+			if(isset($data['listskeypoints']) && is_array($data['listskeypoints'])) {
+				foreach($data['listskeypoints'] as $listKeyPoints) {
+					$listsKeyPoints[] = new ListKeyPoints($listKeyPoints);
+				}
 			}
-			else {
-				$this->setCharacteristics(array());
-			}
+			$this->setListsKeyPoints($listsKeyPoints);
 		}
 	}	
 
