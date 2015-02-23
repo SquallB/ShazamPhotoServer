@@ -1,7 +1,7 @@
 <?php
 	header("Access-Control-Allow-Orgin: *");
     header("Access-Control-Allow-Methods: *");
-    header("Content-Type: application/json");
+    header("Content-Type: application/json; charset=utf-8");
 
     $args = $_REQUEST;
 	$method = $_SERVER['REQUEST_METHOD'];
