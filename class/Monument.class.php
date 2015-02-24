@@ -3,6 +3,7 @@
 include_once('Localization.class.php');
 include_once('Address.class.php');
 include_once('MonumentCharacteristics.class.php');
+include_once('ListKeyPoints.class.php');
 
 class Monument implements JsonSerializable {
 	private $id;

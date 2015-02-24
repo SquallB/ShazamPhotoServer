@@ -3,8 +3,14 @@
     header("Access-Control-Allow-Methods: *");
     header("Content-Type: application/json; charset=utf-8");
 
-    $args = $_REQUEST;
-	$method = $_SERVER['REQUEST_METHOD'];
+    $method = $_SERVER['REQUEST_METHOD'];
+
+    if($method === 'GET') {
+    	$args = $_GET;
+    }
+    else if($method === 'POST') {
+    	$args = $_POST;
+    }
 
 	include_once('class/MonumentAPI.class.php');
 	$api = new MonumentAPI($args, $method);

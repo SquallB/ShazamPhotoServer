@@ -1,5 +1,7 @@
 <?php
 
+include('KeyPoint.class.php');
+
 class ListKeyPoints implements JsonSerializable {
 	private $id;
 	private $keyPoints;
