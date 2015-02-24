@@ -42,8 +42,10 @@ class AddressDAO extends DAO {
 			return $this->update($data);
 		}
 
-		$cityDAO = new CityDAO($this->getConnection());
-		$cityId = $cityDAO->save($data->getCity());
+		if($data->getCity() !== null) {
+			$cityDAO = new CityDAO($this->getConnection());
+			$cityId = $cityDAO->save($data->getCity());
+		}
 
 		$stmt = $this->getConnection()->prepare('
 		INSERT INTO address

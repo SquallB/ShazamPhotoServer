@@ -40,8 +40,11 @@ class CityDAO extends DAO {
 			return $this->update($data);
 		}
 
-		$countryDAO = new CountryDAO($this->getConnection());
-		$countryId = $countryDAO->save($data->getCountry());
+		if($data->getCountry() !== null) {
+			$countryDAO = new CountryDAO($this->getConnection());
+			$countryId = $countryDAO->save($data->getCountry());
+		}
+		
 		$stmt = $this->getConnection()->prepare('
 		INSERT INTO city
 		(name, country_id)

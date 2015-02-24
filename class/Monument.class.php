@@ -57,8 +57,11 @@ class Monument implements JsonSerializable {
 					$address = $data['address'];
 				}
 			}
-			else {
+			else if(isset($data['a_id'])) {
 				$address = new Address(array('id' => $data['a_id'], 'number' => $data['number'], 'street' => $data['street'], 'ci_id' => $data['ci_id'], 'ci_name' =>  $data['ci_name'], 'co_id' => $data['co_id'], 'co_name' => $data['co_name']));
+			}
+			else {
+				$address = null;
 			}
 			$this->setAddress($address);
 

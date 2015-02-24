@@ -138,11 +138,15 @@ class MonumentDAO extends DAO {
 			return $this->update($data);
 		}
 
-		$localizationDAO = new LocalizationDAO($this->getConnection());
-		$localizationId = $localizationDAO->save($data->getLocalization());
+		if($data->getLocalization() !== null) {
+			$localizationDAO = new LocalizationDAO($this->getConnection());
+			$localizationId = $localizationDAO->save($data->getLocalization());
+		}
 
-		$addressDAO = new AddressDAO($this->getConnection());
-		$addressId = $addressDAO->save($data->getAddress());
+		if($data->getAddress() !== null) {
+			$addressDAO = new AddressDAO($this->getConnection());
+			$addressId = $addressDAO->save($data->getAddress());
+		}
 
 		$stmt = $this->getConnection()->prepare('
 			INSERT INTO monument

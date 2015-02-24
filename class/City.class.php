@@ -24,7 +24,12 @@ class City implements JsonSerializable {
 				}
 			}
 			else {
-				$country = new Country(array('id' => $data['co_id'], 'name' => $data['co_name']));
+				if(isset($data['co_id'])) {
+					$country = new Country(array('id' => $data['co_id'], 'name' => $data['co_name']));
+				}
+				else {
+					$country = new Country();
+				}
 			}
 			$this->setCountry($country);
 		}

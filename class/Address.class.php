@@ -26,7 +26,12 @@ class Address implements JsonSerializable {
 				}
 			}
 			else {
-				$city = new City(array('id' => $data['ci_id'], 'name' => $data['ci_name'], 'co_id' => $data['co_id'], 'co_name' => $data['co_name']));
+				if(isset($data['ci_id'])) {
+					$city = new City(array('id' => $data['ci_id'], 'name' => $data['ci_name'], 'co_id' => $data['co_id'], 'co_name' => $data['co_name']));
+				}
+				else {
+					$city = new City();
+				}
 			}
 			$this->setCity($city);
 		}
