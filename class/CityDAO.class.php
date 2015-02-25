@@ -40,22 +40,35 @@ class CityDAO extends DAO {
 			return $this->update($data);
 		}
 
-		if($data->getCountry() !== null) {
-			$countryDAO = new CountryDAO($this->getConnection());
-			$countryId = $countryDAO->save($data->getCountry());
-		}
-		
+		$countryDAO = new CountryDAO($this->getConnection());
+		$countryId = $countryDAO->save($data->getCountry());
+
 		$stmt = $this->getConnection()->prepare('
-		INSERT INTO city
-		(name, country_id)
-		VALUES
-		(:name, :country_id)
-		RETURNING id
+			SELECT id
+			FROM city
+			WHERE name=:name AND country_id=:country_id
 		');
 		$stmt->bindParam(':name', $data->getName());
 		$stmt->bindParam(':country_id', $countryId);
 		$stmt->execute();
-		return $stmt->fetch()['id'];
+		if($row = $stmt->fetch()) {
+			$id = $row['id'];
+		}
+		else {			
+			$stmt = $this->getConnection()->prepare('
+			INSERT INTO city
+			(name, country_id)
+			VALUES
+			(:name, :country_id)
+			RETURNING id
+			');
+			$stmt->bindParam(':name', $data->getName());
+			$stmt->bindParam(':country_id', $countryId);
+			$stmt->execute();
+			$id = $stmt->fetch()['id'];
+		}
+
+		return $id;
 	}
 
 	public function update($data) {

@@ -52,11 +52,7 @@ class CountryDAO extends DAO {
 				INSERT INTO country
 				(name)
 				VALUES
-				(:name)
-				WHERE NOT EXISTS (
-				    SELECT id FROM country
-				    WHERE name=:name
-			    )    
+				(:name) 
 				RETURNING id
 				');
 			$stmt->bindParam(':name', $data->getName());

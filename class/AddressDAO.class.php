@@ -38,27 +38,42 @@ class AddressDAO extends DAO {
 	}
 
 	public function save($data) {
-		if($data->getId() !== null) {
+		/*if($data->getId() !== null) {
 			return $this->update($data);
-		}
+		}*/
 
-		if($data->getCity() !== null) {
-			$cityDAO = new CityDAO($this->getConnection());
-			$cityId = $cityDAO->save($data->getCity());
-		}
+		$cityDAO = new CityDAO($this->getConnection());
+		$cityId = $cityDAO->save($data->getCity());
 
 		$stmt = $this->getConnection()->prepare('
-		INSERT INTO address
-		(number, street, city_id)
-		VALUES
-		(:number, :street, :city_id)
-		RETURNING id
+			SELECT id
+			FROM address
+			WHERE number=:number AND street=:street AND city_id=:city_id
 		');
 		$stmt->bindParam(':number', $data->getNumber());
 		$stmt->bindParam(':street', $data->getStreet());
-		$stmt->bindParam(':city_id', $cityId);
+		$stmt->bindParam(':city_id', $cityid);
 		$stmt->execute();
-		return $stmt->fetch()['id'];
+
+		if($row = $stmt->fetch()) {
+			$id = $row['id'];
+		}
+		else {
+			$stmt = $this->getConnection()->prepare('
+			INSERT INTO address
+			(number, street, city_id)
+			VALUES
+			(:number, :street, :city_id)
+			RETURNING id
+			');
+			$stmt->bindParam(':number', $data->getNumber());
+			$stmt->bindParam(':street', $data->getStreet());
+			$stmt->bindParam(':city_id', $cityId);
+			$stmt->execute();
+			$id = $stmt->fetch()['id'];
+		}
+
+		return $id;
 	}
 
 	public function update($data) {
