@@ -17,14 +17,14 @@ class MonumentAPI extends API {
 		$dao = new MonumentDAO();
 		$monuments = $dao->searchByName($name);
 
-		return json_encode(array("Search" => $monuments));
+		return array("Search" => $monuments);
 	}
 
 	public function searchByLocalization($latitude, $longitude, $offset) {
 		$dao = new MonumentDAO();
 		$monuments = $dao->searchByLocalization($latitude, $longitude, $offset);
 
-		return json_encode(array("Search" => $monuments));
+		return array("Search" => $monuments);
 	}
 
 	public function processAPI() {
@@ -50,34 +50,26 @@ class MonumentAPI extends API {
 				$monument = new Monument(json_decode($args['monument'], true));
 				$monumentDAO = new MonumentDAO();
 				$monumentDAO->save($monument);
-				$return = json_encode($monument);
+				$return = $monument;
 			}
 		}
 		else if($this->getMethod() === 'PUT') {
-			if(isset($args['id'])) {
-				$dao = new MonumentDAO();
-				$monument = $dao->find($args['id']);
-
-				if(isset($args['year'])) {
-					$monument->setYear($args['year']);
-				}
-
-				if(isset($args['number'])) {
-					$monument->getAddress()->setNumber($args['number']);
-				}
-
-				if(isset($args['street'])) {
-					$monument->getAddress()->setStreet($args['street']);
-				}
-
-				$dao->save($monument);
+			if(isset($args['monument'])) {
+				$monument = new Monument(json_decode($args['monument'], true));
+				$monumentDAO = new MonumentDAO();
+				$monumentDAO->save($monument);
+				$return = $monument;
 			}
 		}
 		else if($this->getMethod() === 'DELETE') {
-
+			if(isset($args['id'])) {
+				$monumentDAO = new MonumentDAO();
+				$monement = $monumentDAO->find($args['id']);
+				$monumentDAO->delete($monument);
+			}
 		}
 
-		return $return;
+		return json_encode($return);
 	}
 }
 

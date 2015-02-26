@@ -1,0 +1,3 @@
+RewriteEngine On
+RewriteBase /shazam/
+RewriteRule monument/(.*)$ api.php?n=$1 [QSA,NC,L]
