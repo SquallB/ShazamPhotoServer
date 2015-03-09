@@ -92,3 +92,21 @@ CREATE TABLE key_points
 	list_id		INTEGER	NOT NULL REFERENCES list_key_points (id),
 	primary key (id)
 );
+
+CREATE TABLE list_descriptors
+(
+	id			serial	NOT NULL,
+	monument_id	serial	NOT NULL REFERENCES monument (id),
+	primary key (id)
+);
+
+CREATE TABLE descriptor
+(
+	id 		serial 			NOT NULL,
+	dims	INTEGER			NOT NULL,
+	rows	INTEGER 		NOT NULL,
+	cols	INTEGER			NOT NULL,
+	data	VARCHAR(5000)	NOT NULL,
+	list_id	INTEGER	NOT NULL REFERENCES list_descriptors (id),
+	primary key (id)
+);

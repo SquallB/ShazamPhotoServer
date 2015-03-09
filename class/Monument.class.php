@@ -4,6 +4,7 @@ include_once('Localization.class.php');
 include_once('Address.class.php');
 include_once('MonumentCharacteristics.class.php');
 include_once('ListKeyPoints.class.php');
+include_once('ListDescriptors.class.php');
 
 class Monument implements JsonSerializable {
 	private $id;
@@ -15,6 +16,7 @@ class Monument implements JsonSerializable {
 	private $localization;
 	private $address;
 	private $listsKeyPoints;
+	private $listsDescriptors;
 
 	public function __construct($data = null) {
 		if (is_array($data)) {
@@ -72,6 +74,14 @@ class Monument implements JsonSerializable {
 				}
 			}
 			$this->setListsKeyPoints($listsKeyPoints);
+
+			$listsDescriptors = array();
+			if(isset($data['listsdescriptors']) && is_array($data['listsdescriptors'])) {
+				foreach($data['listsdescriptors'] as $listDescriptors) {
+					$listsDescriptors[] = new ListDescriptor($listDescriptors);
+				}
+			}
+			$this->setListsDescriptors($listsDescriptors);
 		}
 	}	
 
@@ -165,6 +175,16 @@ class Monument implements JsonSerializable {
     	}
     }
 
+    public function getListsDescriptors() {
+    	return $this->listsDescriptors;
+    }
+
+    public function setListsDescriptors($listsDescriptors) {
+    	if(is_array($listsDescriptors)) {
+    		$this->listsDescriptors = $listsDescriptors;
+    	}
+    }
+
  	public function jsonSerialize() {
         return [
             'characteristics' => $this->getCharacteristics(),
@@ -174,7 +194,8 @@ class Monument implements JsonSerializable {
             'nblikes' => $this->getNbLikes(),
             'localization' => $this->getLocalization(),
             'address' => $this->getAddress(),
-            'listskeypoints' => $this->getListsKeyPoints()
+            'listskeypoints' => $this->getListsKeyPoints(),
+            'listsdescriptors' => $this->getListsDescriptors()
         ];
     }
 }
