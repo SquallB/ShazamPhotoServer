@@ -2,21 +2,21 @@
 
 class Descriptor implements JsonSerializable {
 	private $id;
-	private $dims;
 	private $rows;
 	private $cols;
 	private $data;
+	private $type;
 
-	public __construct($data = null) {
+	public function __construct($data = null) {
 		if(is_array($data)) {
 			if (isset($data['id'])) {
 				$this->setId($data['id']);
 			}
 
-			$this->setDims($data['dims']);
 			$this->setRows($data['rows']);
 			$this->setCols($data['cols']);
 			$this->setData($data['data']);
+			$this->setType($data['type']);
 		}
 	}
 
@@ -30,31 +30,11 @@ class Descriptor implements JsonSerializable {
 		}
  	}
 
-	public function getDims() {
-		return $this->dims;
-	}
-
-	public function setDims($dims) {
-		if(is_numeric($dims)) {
-			$this->dims = $dims;
-		}
-	}
-
-	public function getDims() {
-		return $this->dims;
-	}
-
-	public function setDims($dims) {
-		if(is_numeric($dims)) {
-			$this->dims = $dims;
-		}
-	}
-
 	public function getRows() {
 		return $this->rows;
 	}
 
-	public function setCols($rows) {
+	public function setRows($rows) {
 		if(is_numeric($rows)) {
 			$this->rows = $rows;
 		}
@@ -80,12 +60,22 @@ class Descriptor implements JsonSerializable {
 		}
 	}
 
+	public function getType() {
+		return $this->type;
+	}
+
+	public function setType($type) {
+		if(is_numeric($type)) {
+			$this->type = $type;
+		}
+	}
+
 	public function jsonSerialize() {
         return [
-            'dims' => $this->getDims(),
             'rows' => $this->getRows(),
             'cols' => $this->getCols(),
             'data' => $this->getData(),
+            'type' => $this->getType()
         ];
     }
 }
