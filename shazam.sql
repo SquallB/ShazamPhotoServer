@@ -93,13 +93,6 @@ CREATE TABLE key_points
 	primary key (id)
 );
 
-CREATE TABLE list_descriptors
-(
-	id			serial	NOT NULL,
-	monument_id	serial	NOT NULL REFERENCES monument (id),
-	primary key (id)
-);
-
 CREATE TABLE descriptor
 (
 	id 		serial 			NOT NULL,
@@ -107,6 +100,6 @@ CREATE TABLE descriptor
 	rows	INTEGER 		NOT NULL,
 	cols	INTEGER			NOT NULL,
 	data	VARCHAR(5000)	NOT NULL,
-	list_id	INTEGER	NOT NULL REFERENCES list_descriptors (id),
+	monument_id	serial	NOT NULL REFERENCES monument (id),
 	primary key (id)
 );

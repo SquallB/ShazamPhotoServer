@@ -47,9 +47,10 @@ class MonumentAPI extends API {
 		}
 		else if($this->getMethod() === 'POST') {
 			if(isset($args['monument'])) {
+				$args['monument'] = $args['monument'];
 				$monument = new Monument(json_decode($args['monument'], true));
 				$monumentDAO = new MonumentDAO();
-				$monumentDAO->save($monument);
+				//$monumentDAO->save($monument);
 				$return = $monument;
 			}
 		}

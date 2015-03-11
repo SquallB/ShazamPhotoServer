@@ -4,7 +4,7 @@ include_once('Localization.class.php');
 include_once('Address.class.php');
 include_once('MonumentCharacteristics.class.php');
 include_once('ListKeyPoints.class.php');
-include_once('ListDescriptors.class.php');
+include_once('Descriptor.class.php');
 
 class Monument implements JsonSerializable {
 	private $id;
@@ -16,7 +16,7 @@ class Monument implements JsonSerializable {
 	private $localization;
 	private $address;
 	private $listsKeyPoints;
-	private $listsDescriptors;
+	private $descriptors;
 
 	public function __construct($data = null) {
 		if (is_array($data)) {
@@ -75,13 +75,13 @@ class Monument implements JsonSerializable {
 			}
 			$this->setListsKeyPoints($listsKeyPoints);
 
-			$listsDescriptors = array();
-			if(isset($data['listsdescriptors']) && is_array($data['listsdescriptors'])) {
-				foreach($data['listsdescriptors'] as $listDescriptors) {
-					$listsDescriptors[] = new ListDescriptor($listDescriptors);
+			$descriptors = array();
+			if(isset($data['descriptors']) && is_array($data['descriptors'])) {
+				foreach($data['descriptors'] as $descriptor) {
+					$descriptors[] = new Descriptor($descriptor);
 				}
 			}
-			$this->setListsDescriptors($listsDescriptors);
+			$this->setDescriptors($descriptors);
 		}
 	}	
 
@@ -175,13 +175,13 @@ class Monument implements JsonSerializable {
     	}
     }
 
-    public function getListsDescriptors() {
-    	return $this->listsDescriptors;
+    public function getDescriptors() {
+    	return $this->descriptors;
     }
 
-    public function setListsDescriptors($listsDescriptors) {
-    	if(is_array($listsDescriptors)) {
-    		$this->listsDescriptors = $listsDescriptors;
+    public function setDescriptors($descriptors) {
+    	if(is_array($descriptors)) {
+    		$this->descriptors = $descriptors;
     	}
     }
 
@@ -195,7 +195,7 @@ class Monument implements JsonSerializable {
             'localization' => $this->getLocalization(),
             'address' => $this->getAddress(),
             'listskeypoints' => $this->getListsKeyPoints(),
-            'listsdescriptors' => $this->getListsDescriptors()
+            'descriptors' => $this->getDescriptors()
         ];
     }
 }

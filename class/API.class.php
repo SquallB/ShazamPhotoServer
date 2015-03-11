@@ -19,8 +19,8 @@ abstract class API {
 		if(is_array($args)) {
 			$this->args = array();
 			foreach($args as $key => $value) {
-				$key = pg_escape_string($key);
-				$value = pg_escape_string($value);
+				$key = $key;
+				$value = $value;
 				$this->args[$key] = $value;
 			}
 		}
