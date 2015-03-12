@@ -30,7 +30,7 @@ class MonumentAPI extends API {
 	public function processAPI() {
 		$return = '{}';
 		$args = $this->getArgs();
-
+		
 		if($this->getMethod() === 'GET') {
 			if(isset($args['n'])) {
 				$return = $this->searchByName($args['n']);
@@ -50,7 +50,7 @@ class MonumentAPI extends API {
 				$args['monument'] = $args['monument'];
 				$monument = new Monument(json_decode($args['monument'], true));
 				$monumentDAO = new MonumentDAO();
-				//$monumentDAO->save($monument);
+				$monumentDAO->save($monument);
 				$return = $monument;
 			}
 		}
@@ -65,7 +65,7 @@ class MonumentAPI extends API {
 		else if($this->getMethod() === 'DELETE') {
 			if(isset($args['id'])) {
 				$monumentDAO = new MonumentDAO();
-				$monement = $monumentDAO->find($args['id']);
+				$monument = $monumentDAO->find($args['id']);
 				$monumentDAO->delete($monument);
 			}
 		}

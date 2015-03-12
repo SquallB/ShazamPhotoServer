@@ -11,7 +11,7 @@ class ListKeyPoints implements JsonSerializable {
 			if(isset($data['id'])) {
 				$this->setId($data['id']);
 			}
-
+			
 			$keyPoints = array();
 			if(isset($data['keypoints']) && is_array($data['keypoints'])) {
 				foreach($data['keypoints'] as $keyPoint) {

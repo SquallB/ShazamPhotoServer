@@ -70,6 +70,9 @@ class Monument implements JsonSerializable {
 			$listsKeyPoints = array();
 			if(isset($data['listskeypoints']) && is_array($data['listskeypoints'])) {
 				foreach($data['listskeypoints'] as $listKeyPoints) {
+					if(!isset($listKeyPoints['keypoints'])) {
+						$listKeyPoints = array('keypoints' => $listKeyPoints);
+					}
 					$listsKeyPoints[] = new ListKeyPoints($listKeyPoints);
 				}
 			}

@@ -207,6 +207,21 @@ class MonumentDAO extends DAO {
 			}
 		}
 
+		$stmt = $this->getConnection()->prepare('
+			INSERT INTO descriptor
+			(rows, cols, data, type, monument_id)
+			VALUES
+			(:rows, :cols, :data, :type, :monument_id)
+		');
+		foreach($list->getDescriptors() as $descriptor) {
+				$stmt->bindParam(':rows', $descriptor->getRows());
+				$stmt->bindParam(':cols', $descriptor->getCols());
+				$stmt->bindParam(':data', $descriptor->getData());
+				$stmt->bindParam(':type', $descriptor->getType());
+				$stmt->bindParam(':monument_id', $monumentId);
+				$stmt->execute();
+			}
+
 		return $monumentId;
 	}
 
