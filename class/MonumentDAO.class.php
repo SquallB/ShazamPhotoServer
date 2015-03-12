@@ -213,7 +213,7 @@ class MonumentDAO extends DAO {
 			VALUES
 			(:rows, :cols, :data, :type, :monument_id)
 		');
-		foreach($list->getDescriptors() as $descriptor) {
+		foreach($data->getDescriptors() as $descriptor) {
 				$stmt->bindParam(':rows', $descriptor->getRows());
 				$stmt->bindParam(':cols', $descriptor->getCols());
 				$stmt->bindParam(':data', $descriptor->getData());

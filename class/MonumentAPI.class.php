@@ -47,10 +47,20 @@ class MonumentAPI extends API {
 		}
 		else if($this->getMethod() === 'POST') {
 			if(isset($args['monument'])) {
-				$args['monument'] = $args['monument'];
+				$file = fopen('input.txt', 'a');
+				ob_start();
+				var_dump($args['monument']);
+				fwrite($file, ob_get_contents());
+				ob_end_clean();
 				$monument = new Monument(json_decode($args['monument'], true));
 				$monumentDAO = new MonumentDAO();
 				$monumentDAO->save($monument);
+				$file = fopen('output.txt', 'a');
+				ob_start();
+				var_dump($monument);
+				fwrite($file, ob_get_contents());
+				ob_end_clean();
+				fclose($file);
 				$return = $monument;
 			}
 		}
