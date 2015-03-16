@@ -53,6 +53,21 @@ class MonumentDAO extends DAO {
 		return $lists;
 	}
 
+	private function getDescriptors($monumentId) {
+		$stmt = $this->getConnection()->prepare('
+			SELECT id, rows, cols, type, data
+			FROM descriptor
+			WHERE monument_id = :id;
+		');
+		$stmt->bindParam(':id', $monumentId);
+		$stmt->execute();
+		$descriptors = array();
+		foreach($stmt->fetchAll() as $row) {
+			$descriptors[] = new Descriptor($row);
+		}
+		return $descriptors;
+	}
+
 	public function find($id) {
 		 $stmt = $this->getConnection()->prepare('
 			SELECT m.id, m.photoPath, m.year, m.nbVisitors, m.nbLikes, l.id as l_id, l.latitude, l.longitude, a.id as a_id, a.number, a.street, ci.id as ci_id, ci.name as ci_name, co.id as co_id, co.name as co_name
@@ -69,6 +84,7 @@ class MonumentDAO extends DAO {
 
 		$monument->setCharacteristics($this->getCharacteristics($id));
 		$monument->setListsKeyPoints($this->getListKeyPoints($id));
+		$monument->setDescriptors($this->getDescriptors($id));
 		
 		return $monument;
 	}
@@ -89,6 +105,7 @@ class MonumentDAO extends DAO {
 			$monument = new Monument($row);
 			$monument->setCharacteristics($this->getCharacteristics($monument->getId()));
 			$monument->setListsKeyPoints($this->getListKeyPoints($monument->getId()));
+			$monument->setDescriptors($this->getDescriptors($monument->getId()));
 			$array[] = $monument;
 		}
 		return $array;
@@ -214,13 +231,13 @@ class MonumentDAO extends DAO {
 			(:rows, :cols, :data, :type, :monument_id)
 		');
 		foreach($data->getDescriptors() as $descriptor) {
-				$stmt->bindParam(':rows', $descriptor->getRows());
-				$stmt->bindParam(':cols', $descriptor->getCols());
-				$stmt->bindParam(':data', $descriptor->getData());
-				$stmt->bindParam(':type', $descriptor->getType());
-				$stmt->bindParam(':monument_id', $monumentId);
-				$stmt->execute();
-			}
+			$stmt->bindParam(':rows', $descriptor->getRows());
+			$stmt->bindParam(':cols', $descriptor->getCols());
+			$stmt->bindParam(':data', $descriptor->getData());
+			$stmt->bindParam(':type', $descriptor->getType());
+			$stmt->bindParam(':monument_id', $monumentId);
+			$stmt->execute();
+		}
 
 		return $monumentId;
 	}
@@ -371,6 +388,14 @@ class MonumentDAO extends DAO {
 				$stmt2->execute();
 			}
 			$stmt->bindParam(':id', $list->getId());
+			$stmt->execute();
+		}
+		$stmt = $this->getConnection()->prepare('
+			DELETE FROM descriptor
+			WHERE id = :id
+		');
+		foreach($data->getDescriptors() as $descriptor) {
+			$stmt->bindParam(':id', $descriptor->getId());
 			$stmt->execute();
 		}
 		$stmt = $this->getConnection()->prepare('

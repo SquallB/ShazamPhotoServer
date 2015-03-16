@@ -95,11 +95,11 @@ CREATE TABLE key_points
 
 CREATE TABLE descriptor
 (
-	id 		serial 			NOT NULL,
-	rows	INTEGER 		NOT NULL,
-	cols	INTEGER			NOT NULL,
-	type	INTEGER			NOT NULL,
-	data	VARCHAR(5000)	NOT NULL,
+	id 		serial 		NOT NULL,
+	rows	INTEGER 	NOT NULL,
+	cols	INTEGER		NOT NULL,
+	type	INTEGER		NOT NULL,
+	data	TEXT		NOT NULL,
 	monument_id	serial	NOT NULL REFERENCES monument (id),
 	primary key (id)
 );
