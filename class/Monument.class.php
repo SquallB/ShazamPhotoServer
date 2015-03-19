@@ -38,8 +38,10 @@ class Monument implements JsonSerializable {
 			$this->setNbLikes($data['nblikes']);
 
 			if(isset($data['localization'])) {
+				
 				if(is_array($data['localization'])) {
 					$localization = new Localization($data['localization']);
+
 				}
 				else {
 					$localization = $data['localization'];
@@ -186,6 +188,10 @@ class Monument implements JsonSerializable {
     	if(is_array($descriptors)) {
     		$this->descriptors = $descriptors;
     	}
+    }
+
+    public function setDescriptorsAndParse($data){
+		$this->descriptors->setData($data);
     }
 
  	public function jsonSerialize() {

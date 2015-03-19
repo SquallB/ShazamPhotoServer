@@ -64,6 +64,7 @@ $monuments = $dao->findAll();
 				  <td>' . $monument->getAddress()->getCity()->getName() . '</td>
 				  <td>' . $monument->getAddress()->getCity()->getCountry()->getName() . '</td>
 				  <td><a href="?action=delete&id=' . $monument->getId() . '">X</td>
+				  <td/></td>
 				 </tr>';
 		}
 

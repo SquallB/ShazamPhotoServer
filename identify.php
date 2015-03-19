@@ -21,6 +21,9 @@ if(isset($_POST['listskeypoints']) && isset($_POST['descriptors'])) {
 	$dao = new MonumentDAO();
 	$monuments = $dao->findAll();
 
+	$ratio = 0.1;
+	$file2 = fopen('ratio.txt', 'a');
+	fwrite($file2, date("H:i:s") . ' ');
 	foreach($monuments as $monument) {
 		if(count($monument->getListsKeypoints()) > 0 && count($monument->getDescriptors()) > 0) {
 			$file = fopen('../cpp/arg3.txt', 'w');
@@ -31,15 +34,29 @@ if(isset($_POST['listskeypoints']) && isset($_POST['descriptors'])) {
 			fwrite($file, json_encode($monument->getDescriptors()[0], JSON_NUMERIC_CHECK));
 			fclose($file);
 
-			if(exec('../cpp/compare')) {
+			/*if(exec('../cpp/compare')) {
+				$json = json_encode($monument);
+			}*/
+
+			$result = exec('../cpp/compare');
+			
+			fwrite($file2, $result . ' ');
+
+			if($result > $ratio) {
+				$ratio = $result;
 				$json = json_encode($monument);
 			}
 		}
 	}
+	fclose($file2);
 }
 else {
 	$json = '{"error", "arguments not found"}';
 }
+
+$file = fopen('output.txt', 'w');
+fwrite($file, $json);
+fclose($file);
 
 echo $json
 
