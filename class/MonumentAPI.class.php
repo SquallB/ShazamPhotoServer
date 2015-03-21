@@ -8,11 +8,8 @@ class MonumentAPI extends API {
 		parent::__construct($args, $method, $returnType);
 	}
 
-	public function getAll() {
-		$dao = new MonumentDAO();
-		return $dao->findAll();
-	}
-
+	//performs a query in the dabatase to look for monuments with a name containing the string
+	//return an array (called search) with monuments
 	public function searchByName($name) {
 		$dao = new MonumentDAO();
 		$monuments = $dao->searchByName($name);
@@ -20,6 +17,8 @@ class MonumentAPI extends API {
 		return array("Search" => $monuments);
 	}
 
+	//return the monuments localized in a square (its size is determined by the offset) around
+	//the specifed position
 	public function searchByLocalization($latitude, $longitude, $offset) {
 		$dao = new MonumentDAO();
 		$monuments = $dao->searchByLocalization($latitude, $longitude, $offset);
@@ -27,6 +26,8 @@ class MonumentAPI extends API {
 		return array("Search" => $monuments);
 	}
 
+	//function used to process the api, using the given method and arguments
+	//return something in json
 	public function processAPI() {
 		$return = '{}';
 		$args = $this->getArgs();
@@ -47,12 +48,6 @@ class MonumentAPI extends API {
 		}
 		else if($this->getMethod() === 'POST') {
 			if(isset($args['monument'])) {
-				$file = fopen("./input.txt", "w");
-			    ob_start();
-			    var_dump($args['monument']);
-			    fwrite($file, ob_get_contents());
-			    ob_end_clean();
-			    fclose($file);
 				$monument = new Monument(json_decode($args['monument'], true));
 				$monumentDAO = new MonumentDAO();
 				$monumentDAO->save($monument);
@@ -60,18 +55,36 @@ class MonumentAPI extends API {
 			}
 		}
 		else if($this->getMethod() === 'PUT') {
-			if(isset($args['monument'])) {
-				$monument = new Monument(json_decode($args['monument'], true));
-				$monumentDAO = new MonumentDAO();
-				$monumentDAO->save($monument);
-				$return = $monument;
-			}
-		}
-		else if($this->getMethod() === 'DELETE') {
 			if(isset($args['id'])) {
 				$monumentDAO = new MonumentDAO();
 				$monument = $monumentDAO->find($args['id']);
-				$monumentDAO->delete($monument);
+
+				if(isset($args['nblikes'])) {
+					$nbLikes = $monument->getNbLikes();
+					if($args['nblikes']) {
+						$nbLikes++;
+					}
+					else {
+						$nbLikes--;
+					}
+					$monument->setNbLikes($nbLikes);
+				}
+				if(isset($args['nbvisitors'])) {
+					$nbVisitors = $monument->getNbVisitors();
+					if($args['nbVisitors']) {
+						$nbVisitors++;
+					}
+					else {
+						$nbVisitors--;
+					}
+					$monument->setNbVisitors($nbVisitors);
+				}
+
+				$monumentDAO->save($monument);
+				$return = $monument;
+			}
+			else {
+				$return = $args;
 			}
 		}
 

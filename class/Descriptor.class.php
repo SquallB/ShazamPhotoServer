@@ -56,11 +56,9 @@ class Descriptor implements JsonSerializable {
 
 	public function setData($data) {
 		if(is_string($data)) {
+			//$this->data = str_replace(' ', '+', $data);
+			//$this->data = str_replace('\\', '', $this->data);
 			$this->data = $data;
-			$this->data = str_replace(' ', '+', $this->data);
-			$file = fopen('data.txt', 'w');
-			fwrite($file, $this->getData());
-			fclose($file);
 		}
 	}
 
