@@ -324,24 +324,24 @@ class MonumentDAO extends DAO {
 			$stmt->execute();
 			$listId = $stmt->fetch()['id'];
 
-			$stmt1 = $this->getConnection()->prepare('
+			$stmt3 = $this->getConnection()->prepare('
 				INSERT INTO key_points
 				(x, y, size, angle, response, octave, class_id, list_id)
 				VALUES
 				(:x, :y, :size, :angle, :response, :octave, :class_id, :list_id)
 			');
-			$stmt2 = $this->getConnection()->prepare('
+			$stmt4 = $this->getConnection()->prepare('
 				UPDATE key_points
-				SET x = :x, y = :y, size = :size, angle = :angle, response = :response, octave = :octave, class_id = :class_id, list_id = :listId
+				SET x = :x, y = :y, size = :size, angle = :angle, response = :response, octave = :octave, class_id = :class_id
 				WHERE id = :id
 			');
 			foreach($list->getKeyPoints() as $keyPoint) {
 				if($keyPoint->getId() !== null) {
-					$stmt = $stmt2;
+					$stmt = $stmt4;
 					$stmt->bindParam(':id', $keyPoint->getId());
 				}
 				else {
-					$stmt = $stmt1;
+					$stmt = $stmt3;
 				}
 				$stmt->bindParam(':x', $keyPoint->getX());
 				$stmt->bindParam(':y', $keyPoint->getY());
@@ -350,7 +350,6 @@ class MonumentDAO extends DAO {
 				$stmt->bindParam(':response', $keyPoint->getResponse());
 				$stmt->bindParam(':octave', $keyPoint->getOctave());
 				$stmt->bindParam(':class_id', $keyPoint->getClassId());
-				$stmt->bindParam(':list_id', $listId);
 				$stmt->execute();
 			}
 		}

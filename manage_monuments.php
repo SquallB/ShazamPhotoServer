@@ -35,6 +35,8 @@ $monuments = $dao->findAll();
 			<th>ID</th>
 			<th>Name</th>
 			<th>Description</th>
+			<th>Likes</th>
+			<th>Visiteurs</th>
 			<th>Chemin de la photo</th>
 			<th>Année de construction</th>
 			<th>Localisation</th>
@@ -59,6 +61,8 @@ $monuments = $dao->findAll();
 						echo '<option>' . $characteristic->getDescription() . '</option>';
 					}
 			echo '</select></td>
+				  <td>' . $monument->getNbLikes() . '</td>
+				  <td>' . $monument->getNbVisitors() . '</td>
 				  <td>' . $monument->getPhotoPath() . '</td>
 				  <td>' . $monument->getYear() . '</td>
 				  <td>' . $monument->getLocalization()->getLatitude() . ', ' . $monument->getLocalization()->getLongitude() . '</td>
