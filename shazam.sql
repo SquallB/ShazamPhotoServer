@@ -41,10 +41,10 @@ CREATE TABLE address
 CREATE TABLE monument
 (
 	id				serial			NOT NULL,
-	photoPath		VARCHAR(45),
+	photopath		VARCHAR(150),
 	year			INTEGER,
-	nbVisitors		INTEGER,
-	nbLikes			INTEGER,
+	nbvisitors		INTEGER,
+	nblikes			INTEGER,
 	localization_id	INTEGER 		NOT NULL REFERENCES localization (id),
 	address_id		INTEGER			NOT NULL REFERENCES address (id),
 	primary key (id)

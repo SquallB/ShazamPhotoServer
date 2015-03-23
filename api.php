@@ -10,6 +10,10 @@
     }
     else if($method === 'POST') {
     	$args = $_POST;
+
+        if(isset($_FILES['photo'])) {
+            $args['photo'] = $_FILES['photo'];
+        }
     }
     else if($method === 'PUT') {
         parse_str(file_get_contents("php://input"), $args);
