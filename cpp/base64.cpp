@@ -1,96 +1,87 @@
 #include "base64.h"
+using namespace std;
+static const string base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+static char  decodedBlock[3];
+string mEncode(string const& toEncode) {
+    int expectedSize = toEncode.size();
+    
+    
+    string base64Str = "";
+    if (toEncode.size() == 0) {
+        return base64Str;
+    } else {
+        while ((expectedSize % 3) != 0) {
+            
+            expectedSize++;
+        }
 
-static const std::string base64_chars = 
-             "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-             "abcdefghijklmnopqrstuvwxyz"
-             "0123456789+/";
-
-
-static inline bool is_base64(unsigned char c) {
-  return (isalnum(c) || (c == '+') || (c == '/'));
-}
-
-std::string base64_encode(unsigned char const* bytes_to_encode, unsigned int in_len) {
-  std::string ret;
-  int i = 0;
-  int j = 0;
-  unsigned char char_array_3[3];
-  unsigned char char_array_4[4];
-
-  while (in_len--) {
-    char_array_3[i++] = *(bytes_to_encode++);
-    if (i == 3) {
-      char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
-      char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
-      char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
-      char_array_4[3] = char_array_3[2] & 0x3f;
-
-      for(i = 0; (i <4) ; i++)
-        ret += base64_chars[char_array_4[i]];
-      i = 0;
+        int i = 0;
+        for (i = 0; i < toEncode.size(); i += 3) {
+            string block = toEncode.substr(i, 3);
+            string encodedBlock=blockEncode(block);
+            base64Str.append(encodedBlock);
+            
+        }
+        if(toEncode.size()<expectedSize){
+            string lastBlock = "";
+            for (i; i < expectedSize; i++) {
+                if (i < toEncode.size()) {
+                    lastBlock.append(&toEncode[i]);
+                }else{
+                    
+                    lastBlock.append("0");
+                }
+            }
+            
+            string encodedBlock=blockEncode(lastBlock);
+            base64Str.append(encodedBlock);
+        }
     }
-  }
-
-  if (i)
-  {
-    for(j = i; j < 3; j++)
-      char_array_3[j] = '\0';
-
-    char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
-    char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
-    char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
-    char_array_4[3] = char_array_3[2] & 0x3f;
-
-    for (j = 0; (j < i + 1); j++)
-      ret += base64_chars[char_array_4[j]];
-
-    while((i++ < 3))
-      ret += '=';
-
-  }
-
-  return ret;
-
+    return base64Str;
 }
 
-std::string base64_decode(std::string const& encoded_string) {
-  size_t in_len = encoded_string.size();
-  size_t i = 0;
-  size_t j = 0;
-  int in_ = 0;
-  unsigned char char_array_4[4], char_array_3[3];
-  std::string ret;
+string blockEncode(string const& block) {
+    
+    unsigned char mask1 = 0b00000011;
+    unsigned char mask2 = 0b11110000;
+    unsigned char mask3 = 0b00001111;
+    unsigned char mask4 = 0b11000000;
+    
+    int b64Index[4];
+    b64Index[0] = block[0]>>2;
+    b64Index[1] = ((block[0]&mask1)<<4)xor((block[1]&mask2)>>4);
+    b64Index[2] = ((block[1]&mask3)<<2)xor((block[2]&mask4)>>6);
+    b64Index[3] = block[2]&(~mask4);
+    
+    
+    char myChar[5] = {base64_chars[b64Index[0]],base64_chars[b64Index[1]],base64_chars[b64Index[2]],base64_chars[b64Index[3]]};
+   
+    string encodedBlock =  string(myChar);
+    return encodedBlock;
+}
 
-  while (in_len-- && ( encoded_string[in_] != '=') && is_base64(encoded_string[in_])) {
-    char_array_4[i++] = encoded_string[in_]; in_++;
-    if (i ==4) {
-      for (i = 0; i <4; i++)
-        char_array_4[i] = static_cast<unsigned char>(base64_chars.find(char_array_4[i]));
+unsigned char* mDecode(string const& s) {
+    unsigned char* decoded = new unsigned char[((s.size()*3) / 4) + 1];
+    
+    for (int i = 0; i < s.size(); i += 4) {
+        int j = (i * 3) / 4;
+        blockDecode(s.substr(i, 4));
 
-      char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-      char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-      char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
-
-      for (i = 0; (i < 3); i++)
-        ret += char_array_3[i];
-      i = 0;
+        decoded[j] = (unsigned char) decodedBlock[0];
+        decoded[j + 1] = (unsigned char) decodedBlock[1];
+        decoded[j + 2] = (unsigned char) decodedBlock[2];
     }
-  }
-
-  if (i) {
-    for (j = i; j <4; j++)
-      char_array_4[j] = 0;
-
-    for (j = 0; j <4; j++)
-      char_array_4[j] = static_cast<unsigned char>(base64_chars.find(char_array_4[j]));
-
-    char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-    char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-    char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
-
-    for (j = 0; (j < i - 1); j++) ret += char_array_3[j];
-  }
-
-  return ret;
+    
+    return decoded;
 }
 
+void blockDecode(string const& block) {
+    unsigned char mask1 = 0b00000011;
+    unsigned char mask2 = 0b00111100;
+    unsigned char mask3 = 0b00001111;
+    unsigned char mask4 = 0b00110000;
+
+    decodedBlock[0] = (char) (base64_chars.find(block[0]) << 2)+((base64_chars.find(block[1])&(mask4)) >> 4);
+    decodedBlock[1] = (char) ((base64_chars.find(block[1])&(mask3)) << 4)+((base64_chars.find(block[2]) & mask2) >> 2);
+    decodedBlock[2] = (char) ((base64_chars.find(block[2])&(mask1)) << 6)+(base64_chars.find(block[3]));
+}
