@@ -50,11 +50,12 @@ class MonumentAPI extends API {
 			if(isset($args['monument'])) {
 				$monument = new Monument(json_decode($args['monument'], true));
 				if(isset($args['photo'])) {
-					$uploaddir = '/home/shazam/photos/';
+					$uploaddir = '/home/shazam/public_html/photos/';
 					$uploadfile = $uploaddir . basename($args['photo']['name']);
 
 					if(move_uploaded_file($args['photo']['tmp_name'], $uploadfile)) {
-					    $monument->setPhotoPath($uploadfile);
+						$photoPath = 'http://37.187.216.159/shazam/photos/' . basename($uploadfile);
+					    $monument->setPhotoPath($photoPath);
 					}
 				}
 				$monumentDAO = new MonumentDAO();
