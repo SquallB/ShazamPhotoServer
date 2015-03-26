@@ -67,11 +67,7 @@ class MonumentAPI extends API {
 			if(isset($args['id'])) {
 				$monumentDAO = new MonumentDAO();
 				$monument = $monumentDAO->find($args['id']);
-
-				$file = fopen('input.txt', 'w');
-				fwrite($file, $args['id']);
-				fclose($file);
-
+				
 				if(isset($args['nblikes'])) {
 					$nbLikes = $monument->getNbLikes();
 					if($args['nblikes']) {
