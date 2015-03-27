@@ -49,7 +49,7 @@ if(isset($_POST['listskeypoints']) && isset($_POST['descriptors'])) {
 		}
 	}
 
-	if($foundMonument !== null) {
+	if(isset($foundMonument)) {
 		$json = json_encode($foundMonument);
 	}
 }
