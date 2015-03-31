@@ -17,7 +17,7 @@
 
 #include "base64.h"
 
-const double THRESHOLD = 4000;
+const double THRESHOLD = 30000;
 
 using namespace std;
 using namespace cv;
@@ -81,7 +81,7 @@ Mat* getMatFromJson(const char* json) {
 
 //function to use for mobile imae detection
 //params: keypoints of the source and dest image, descriptors of the two images, the accuracy of the test and the acceptance ratio
-double checkDescriptors(vector<KeyPoint> keypoints_object, vector<KeyPoint> keypoints_scene, Mat descriptor1, Mat descriptor2, double accuracy, double expectedRatio) {
+double checkDescriptors(vector<KeyPoint> keypoints_object, vector<KeyPoint> keypoints_scene, Mat descriptor1, Mat descriptor2, double accuracy) {
 
     //-- Step 3: Matching descriptor vectors using FLANN matcher
     BFMatcher matcher(NORM_HAMMING, false);
@@ -109,7 +109,7 @@ double checkDescriptors(vector<KeyPoint> keypoints_object, vector<KeyPoint> keyp
 
     //need at least 4 match
     if (good_matches.size() >= 4) {
-        Mat H = findHomography(obj, scene, CV_RANSAC, 8);
+        Mat H = findHomography(obj, scene, CV_RANSAC, 5);
 
         //-- Get the corners from the image_1 ( the object to be "detected" )
         std::vector<Point2f> obj_corners(4);
@@ -134,7 +134,7 @@ int main(int argc, char** argv) {
     vector<KeyPoint>* keypoints_monument1 = getKeyPointsFromJson(filePoints1.c_str());
     Mat* descriptor1 = getMatFromJson(fileDesc1.c_str());
 
-    double ratio = checkDescriptors(*keypoints_monument1, *keypoints_monument2, *descriptor1, *descriptor2, 0.79, 0.05);
+    double ratio = checkDescriptors(*keypoints_monument1, *keypoints_monument2, *descriptor1, *descriptor2, 0.79);
 
     cout << ratio;
 

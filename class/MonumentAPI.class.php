@@ -2,6 +2,8 @@
 
 include_once('API.class.php');
 include_once('MonumentDAO.class.php');
+include_once('Descriptor.class.php');
+include_once('ListKeyPoints.class.php');
 
 class MonumentAPI extends API {
 	public function __construct($args, $method, $returnType = 0) {
@@ -87,6 +89,22 @@ class MonumentAPI extends API {
 						$nbVisitors--;
 					}
 					$monument->setNbVisitors($nbVisitors);
+				}
+				if(isset($args['descriptors'])) {
+					$descriptors = $monument->getDescriptors();
+					$json = json_decode($args['descriptors'], true);
+					foreach($json as $newDescriptor) {
+						$descriptors[] = new Descriptor($newDescriptor);
+					}
+					$monument->setDescriptors($descriptors);
+				}
+				if(isset($args['listskeypoints'])) {
+					$listsKeyPoints = $monument->getListsKeyPoints();
+					$json = json_decode($args['listskeypoints'], true);
+					foreach($json as $$list) {
+						$listsKeyPoints[] = new ListKeyPoints($list);
+					}
+					$monument->setListsKeyPoints($listsKeyPoints);
 				}
 
 				$monumentDAO->save($monument);
