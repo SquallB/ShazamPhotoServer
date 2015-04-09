@@ -332,7 +332,7 @@ class MonumentDAO extends DAO {
 			');
 			$stmt4 = $this->getConnection()->prepare('
 				UPDATE key_points
-				SET x = :x, y = :y, size = :size, angle = :angle, response = :response, octave = :octave, class_id = :class_id
+				SET x = :x, y = :y, size = :size, angle = :angle, response = :response, octave = :octave, class_id = :class_id, list_id = :list_id
 				WHERE id = :id
 			');
 			foreach($list->getKeyPoints() as $keyPoint) {
@@ -350,8 +350,36 @@ class MonumentDAO extends DAO {
 				$stmt->bindParam(':response', $keyPoint->getResponse());
 				$stmt->bindParam(':octave', $keyPoint->getOctave());
 				$stmt->bindParam(':class_id', $keyPoint->getClassId());
+				$stmt->bindParam(':list_id', $listId);
 				$stmt->execute();
 			}
+		}
+
+		$stmt1 = $this->getConnection()->prepare('
+			INSERT INTO descriptor
+			(rows, cols, data, type, monument_id)
+			VALUES
+			(:rows, :cols, :data, :type, :monument_id)
+		');
+		$stmt2 = $this->getConnection()->prepare('
+			UPDATE descriptor
+			SET rows = :rows, cols = :cols, data = :data, type = :type, monument_id = :monument_id
+			WHERE id = :id
+		');
+		foreach($data->getDescriptors() as $descriptor) {
+			if($descriptor->getId() !== null) {
+				$stmt = $stmt2;
+				$stmt->bindParam(':id', $list->getId());
+			}
+			else {
+				$stmt = $stmt1;
+			}
+			$stmt->bindParam(':rows', $descriptor->getRows());
+			$stmt->bindParam(':cols', $descriptor->getCols());
+			$stmt->bindParam(':data', $descriptor->getData());
+			$stmt->bindParam(':type', $descriptor->getType());
+			$stmt->bindParam(':monument_id', $monumentId);
+			$stmt->execute();
 		}
 
 		return $monumentId;

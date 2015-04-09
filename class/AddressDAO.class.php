@@ -52,7 +52,7 @@ class AddressDAO extends DAO {
 		');
 		$stmt->bindParam(':number', $data->getNumber());
 		$stmt->bindParam(':street', $data->getStreet());
-		$stmt->bindParam(':city_id', $cityid);
+		$stmt->bindParam(':city_id', $cityId);
 		$stmt->execute();
 
 		if($row = $stmt->fetch()) {

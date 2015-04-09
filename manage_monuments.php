@@ -8,8 +8,11 @@ if(isset($_GET['action']) && isset($_GET['id'])) {
 		$id = pg_escape_string($_GET['id']);
 		$monument = $dao->find($id);
 		if($monument->getId() !== null) {
-			if($monument->getPhotoPath() !== null && file_exists($monument->getPhotoPath())) {
-				unlink($monument->getPhotoPath());
+			if($monument->getPhotoPath() !== null && $monument->getPhotoPath() !== '') {
+				$filePath = '/home/shazam/public_html/photos/' . basename($monument->getPhotoPath());
+				if(file_exists($filePath)) {
+					unlink($filePath);
+				}
 			}
 			$dao->delete($monument);
 		}

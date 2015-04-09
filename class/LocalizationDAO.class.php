@@ -38,16 +38,32 @@ class LocalizationDAO extends DAO {
 		}
 
 		$stmt = $this->getConnection()->prepare('
-		INSERT INTO localization
-		(latitude, longitude)
-		VALUES
-		(:latitude, :longitude)
-		RETURNING id
+			SELECT id
+			FROM localization
+			WHERE latitude=:latitude AND longitude=:longitude
 		');
 		$stmt->bindParam(':latitude', $data->getLatitude());
 		$stmt->bindParam(':longitude', $data->getLongitude());
 		$stmt->execute();
-		return $stmt->fetch()['id'];
+
+		if($row = $stmt->fetch()) {
+			$id = $row['id'];
+		}
+		else {
+			$stmt = $this->getConnection()->prepare('
+			INSERT INTO localization
+			(latitude, longitude)
+			VALUES
+			(:latitude, :longitude)
+			RETURNING id
+			');
+			$stmt->bindParam(':latitude', $data->getLatitude());
+			$stmt->bindParam(':longitude', $data->getLongitude());
+			$stmt->execute();
+			$id = $stmt->fetch()['id'];
+		}
+
+		return $id;
 	}
 
 	public function update($data) {

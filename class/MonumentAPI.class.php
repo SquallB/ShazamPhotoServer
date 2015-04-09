@@ -101,7 +101,7 @@ class MonumentAPI extends API {
 				if(isset($args['listskeypoints'])) {
 					$listsKeyPoints = $monument->getListsKeyPoints();
 					$json = json_decode($args['listskeypoints'], true);
-					foreach($json as $$list) {
+					foreach($json as $list) {
 						$listsKeyPoints[] = new ListKeyPoints($list);
 					}
 					$monument->setListsKeyPoints($listsKeyPoints);
