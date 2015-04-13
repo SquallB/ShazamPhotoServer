@@ -22,26 +22,31 @@ if(isset($_POST['listskeypoints']) && isset($_POST['descriptors'])) {
 
 	if(isset($_POST['localization'])) {
 		$localization = json_decode($_POST['localization'], true);
-		$monuments = $dao->searchByLocalization($localization['latitude'], $localization['longitude'], 0.001);
+		$monumentsIds = $dao->findIdsByLocalization($localization['latitude'], $localization['longitude'], 0.002);
 	}
 	else {
-		$monuments = $dao->findAll();
+		$monumentsIds = $dao->findIds();
 	}
 
-	$ratio = 0.002;
+	$ratio = 0.1;
+	$maxRatio = 0;
 
 	$file2 = fopen('ratio.txt', 'a');
 	fwrite($file2, date("j M G:i:s"));
 
-	foreach($monuments as $monument) {
+	foreach($monumentsIds as $monumentId) {
+		$monument = $dao->find($monumentId);
 		$listsKeyPoints = $monument->getListsKeypoints();
 		$descriptors = $monument->getDescriptors();
 		$size = count($listsKeyPoints);
 		if(count($descriptors) < $size) {
 			$size = count($descriptors);
 		}
-
+		fwrite($file2, ' ' . $monument->getCharacteristics()[0]->getName() . ' (');
+		$tmpMaxRatio = 0;
 		for($i = 0; $i < $size; $i++) {
+			unset($result);
+
 			$file = fopen('../cpp/arg3.txt', 'w');
 			fwrite($file, json_encode(array('keypoints' => $listsKeyPoints[$i]->getKeyPoints()), JSON_NUMERIC_CHECK));
 			fclose($file);
@@ -50,24 +55,30 @@ if(isset($_POST['listskeypoints']) && isset($_POST['descriptors'])) {
 			fwrite($file, json_encode($descriptors[$i], JSON_NUMERIC_CHECK));
 			fclose($file);
 
-			unset($result);
 			exec('../cpp/compare', $result);
 
-			if(isset($result[0]) && isset($result[1])) {
-				fwrite($file2, $result[0] . " " . $result[1] . " ");
-
-				if($result[0] > $ratio || $result[1] > $ratio) {
-					$ratio = $result;
-					$foundMonument = $monument;
-				}
+			if(isset($result[0]) && $result[0] > $tmpMaxRatio){
+				$tmpMaxRatio = $result[0];
+				fwrite($file2, ' ' . $result[0]);
 			}
+			if(isset($result[1]) && $result[1] > $tmpMaxRatio){
+				$tmpMaxRatio = $result[1];
+				fwrite($file2, ' ' . $result[1]);
+			}
+		}
+
+		fwrite($file2, ')');
+		
+		if($tmpMaxRatio >$maxRatio ) {
+			$maxRatio = $tmpMaxRatio;
+			$foundMonument = $monument;
 		}
 	}
 
 	fwrite($file2, PHP_EOL);
 	fclose($file2);
 
-	if(isset($foundMonument)) {
+	if(isset($foundMonument) && ($maxRatio > $ratio)) {
 		$json = json_encode($foundMonument);
 	}
 }

@@ -32,7 +32,7 @@ static const string fileDesc2 = "../cpp/arg4.txt";
 static const string filePoints1 = "../cpp/arg1.txt";
 static const string filePoints2 = "../cpp/arg3.txt";
 
- 
+static double ratioTab[2];
 
 void getDataFromJson(const char* json,int size){
     FILE* fp = fopen(json, "r");
@@ -109,7 +109,7 @@ double checkDescriptors(vector<KeyPoint> keypoints_object, vector<KeyPoint> keyp
 
     //need at least 4 match
     if (good_matches.size() >= 4) {
-        Mat H = findHomography(obj, scene, CV_RANSAC, 5);
+        Mat H = findHomography(obj, scene, CV_RANSAC, 0);
 
         //-- Get the corners from the image_1 ( the object to be "detected" )
         std::vector<Point2f> obj_corners(4);
@@ -134,9 +134,11 @@ int main(int argc, char** argv) {
     vector<KeyPoint>* keypoints_monument1 = getKeyPointsFromJson(filePoints1.c_str());
     Mat* descriptor1 = getMatFromJson(fileDesc1.c_str());
 
-    double ratio = checkDescriptors(*keypoints_monument1, *keypoints_monument2, *descriptor1, *descriptor2, 0.79);
+    double ratio1 = checkDescriptors(*keypoints_monument1, *keypoints_monument2, *descriptor1, *descriptor2, 0.75);
+    double ratio2 = checkDescriptors(*keypoints_monument2, *keypoints_monument1, *descriptor2, *descriptor1, 0.75);
 
-    cout << ratio;
+    cout << ratio1 << endl;
+    cout << ratio2 << endl;
 
     delete[] descriptor1->data;
     delete[] descriptor2->data;

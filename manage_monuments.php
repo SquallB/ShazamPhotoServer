@@ -19,7 +19,7 @@ if(isset($_GET['action']) && isset($_GET['id'])) {
 	}
 }
 
-$monuments = $dao->findAll();
+$monumentsIds = $dao->findIds();
 
 ?>
 
@@ -54,7 +54,8 @@ $monuments = $dao->findAll();
 
 		<?php
 
-		foreach($monuments as $monument) {
+		foreach($monumentsIds as $id) {
+			$monument = $dao->find($id);
 			echo '<tr>
 					<td>' . $monument->getId() . '</td>
 					<td><select>';
@@ -69,7 +70,7 @@ $monuments = $dao->findAll();
 			echo '</select></td>
 				  <td>' . $monument->getNbLikes() . '</td>
 				  <td>' . $monument->getNbVisitors() . '</td>
-				  <td>' . $monument->getPhotoPath() . '</td>
+				  <td><a href="' . $monument->getPhotoPath() . '">' . $monument->getPhotoPath() . '</a></td>
 				  <td>' . $monument->getYear() . '</td>
 				  <td>' . $monument->getLocalization()->getLatitude() . ', ' . $monument->getLocalization()->getLongitude() . '</td>
 				  <td>' . $monument->getAddress()->getNumber() . ' ' . $monument->getAddress()->getStreet() . '</td>

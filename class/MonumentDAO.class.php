@@ -128,6 +128,24 @@ class MonumentDAO extends DAO {
 	}
 
 	public function searchByLocalization($latitude, $longitude, $offset) {
+		$ids = $this->findIdsByLocalization($latitude, $longitude, $offset);
+		$array = array();
+		foreach($ids as $id) {
+			$array[] = $this->find($id);
+		}
+		return $array;
+	}
+
+	public function findIds() {
+		$stmt = $this->getConnection()->prepare('
+			SELECT id
+			FROM monument
+		');
+		$stmt->execute();
+		return $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
+	}
+
+	public function findIdsByLocalization($latitude, $longitude, $offset) {
 		$array = array();
 		$minLatitude = $latitude - $offset;
 		$maxLatitude = $latitude + $offset;
@@ -144,10 +162,7 @@ class MonumentDAO extends DAO {
 		$stmt->bindParam(':minlongitude', $minLongitude);
 		$stmt->bindParam(':maxlongitude', $maxLongitude);
 		$stmt->execute();
-		foreach($stmt->fetchAll() as $row) {
-			$array[] = $this->find($row['id']);
-		}
-		return $array;
+		return $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
 	}
 
 	public function save($data) {

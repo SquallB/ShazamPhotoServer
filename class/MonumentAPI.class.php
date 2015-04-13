@@ -82,7 +82,7 @@ class MonumentAPI extends API {
 				}
 				if(isset($args['nbvisitors'])) {
 					$nbVisitors = $monument->getNbVisitors();
-					if($args['nbVisitors']) {
+					if($args['nbvisitors']) {
 						$nbVisitors++;
 					}
 					else {
