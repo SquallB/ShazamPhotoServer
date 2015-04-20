@@ -20,6 +20,7 @@ class MonumentDAO extends DAO {
 			FROM monument_characteristics mc
 			INNER JOIN language l ON mc.language_id = l.id
 			WHERE mc.monument_id = :id
+			ORDER BY mc.id
 		');
 		$stmt->bindParam(':id', $monumentId);
 		$stmt->execute();
@@ -36,6 +37,7 @@ class MonumentDAO extends DAO {
 			SELECT id
 			FROM list_key_points
 			WHERE monument_id = :id
+			ORDER BY id
 		');
 		$stmt->bindParam(':id', $monumentId);
 		$stmt->execute();
@@ -43,6 +45,7 @@ class MonumentDAO extends DAO {
 			SELECT id, x, y, size, angle, response, octave, class_id
 			FROM key_points
 			WHERE list_id = :id
+			ORDER BY id
 		');
 		foreach($stmt->fetchAll() as $listId) {
 			$stmt2->bindParam(':id', $listId['id']);
@@ -57,7 +60,8 @@ class MonumentDAO extends DAO {
 		$stmt = $this->getConnection()->prepare('
 			SELECT id, rows, cols, type, data
 			FROM descriptor
-			WHERE monument_id = :id;
+			WHERE monument_id = :id
+			ORDER BY id
 		');
 		$stmt->bindParam(':id', $monumentId);
 		$stmt->execute();
@@ -68,7 +72,7 @@ class MonumentDAO extends DAO {
 		return $descriptors;
 	}
 
-	public function find($id) {
+	public function find($id, $descriptors = true) {
 		 $stmt = $this->getConnection()->prepare('
 			SELECT m.id, m.photoPath, m.year, m.nbVisitors, m.nbLikes, l.id as l_id, l.latitude, l.longitude, a.id as a_id, a.number, a.street, ci.id as ci_id, ci.name as ci_name, co.id as co_id, co.name as co_name
 			FROM monument m
@@ -77,19 +81,21 @@ class MonumentDAO extends DAO {
 			INNER JOIN city ci ON a.city_id = ci.id
 			INNER JOIN country co ON ci.country_id = co.id
 			WHERE m.id = :id
+			ORDER BY m.id
 		');
 		$stmt->bindParam(':id', $id);
 		$stmt->execute();
 		$monument = new Monument($stmt->fetch());
-
 		$monument->setCharacteristics($this->getCharacteristics($id));
-		$monument->setListsKeyPoints($this->getListKeyPoints($id));
-		$monument->setDescriptors($this->getDescriptors($id));
+		if($descriptors) {
+			$monument->setListsKeyPoints($this->getListKeyPoints($id));
+			$monument->setDescriptors($this->getDescriptors($id));
+		}
 		
 		return $monument;
 	}
 
-	public function findAll() {
+	public function findAll($descriptors = true) {
 		$stmt = $this->getConnection()->prepare('
 			SELECT m.id, m.photopath, m.year, m.nbvisitors, m.nblikes, l.id as l_id, l.latitude, l.longitude, a.id as a_id, a.number, a.street, ci.id as ci_id, ci.name as ci_name, co.id as co_id, co.name as co_name
 			FROM monument m
@@ -97,6 +103,7 @@ class MonumentDAO extends DAO {
 			INNER JOIN address a ON m.address_id = a.id
 			INNER JOIN city ci ON a.city_id = ci.id
 			INNER JOIN country co ON ci.country_id = co.id
+			ORDER BY m.id
 		');
 		$stmt->execute();
 		$array = array();
@@ -104,34 +111,37 @@ class MonumentDAO extends DAO {
 		foreach($stmt->fetchAll() as $row) {
 			$monument = new Monument($row);
 			$monument->setCharacteristics($this->getCharacteristics($monument->getId()));
-			$monument->setListsKeyPoints($this->getListKeyPoints($monument->getId()));
-			$monument->setDescriptors($this->getDescriptors($monument->getId()));
+			if($descriptors) {
+				$monument->setListsKeyPoints($this->getListKeyPoints($monument->getId()));
+				$monument->setDescriptors($this->getDescriptors($monument->getId()));
+			}
 			$array[] = $monument;
 		}
 		return $array;
 	}
 
-	public function searchByName($name) {
+	public function searchByName($name, $descriptors = true) {
 		$name = '%'.$name.'%';
 		$array = array();
 		$stmt = $this->getConnection()->prepare('
 			SELECT DISTINCT monument_id
 			FROM monument_characteristics
 			WHERE LOWER(name) LIKE LOWER(:name)
+			ORDER BY monument_id
 		');
 		$stmt->bindParam(':name', $name);
 		$stmt->execute();
 		foreach($stmt->fetchAll() as $row) {
-			$array[] = $this->find($row['monument_id']);
+			$array[] = $this->find($row['monument_id'], $descriptors);
 		}
 		return $array;
 	}
 
-	public function searchByLocalization($latitude, $longitude, $offset) {
+	public function searchByLocalization($latitude, $longitude, $offset, $descriptors = true) {
 		$ids = $this->findIdsByLocalization($latitude, $longitude, $offset);
 		$array = array();
 		foreach($ids as $id) {
-			$array[] = $this->find($id);
+			$array[] = $this->find($id, $descriptors);
 		}
 		return $array;
 	}
@@ -140,6 +150,7 @@ class MonumentDAO extends DAO {
 		$stmt = $this->getConnection()->prepare('
 			SELECT id
 			FROM monument
+			ORDER BY id
 		');
 		$stmt->execute();
 		return $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
@@ -156,6 +167,7 @@ class MonumentDAO extends DAO {
 			FROM monument m
 			INNER JOIN localization l ON m.localization_id = l.id
 			WHERE l.latitude > (:minlatitude) AND l.latitude < (:maxlatitude) AND l.longitude > (:minlongitude) AND l.longitude < (:maxlongitude)
+			ORDER BY m.id
 		');
 		$stmt->bindParam(':minlatitude', $minLatitude);
 		$stmt->bindParam(':maxlatitude', $maxLatitude);
@@ -290,7 +302,7 @@ class MonumentDAO extends DAO {
 			INSERT INTO monument_characteristics
 			(name, description, language_id, monument_id)
 			VALUES
-			(:name, :year, :description, :language_id, :monument_id)
+			(:name, :description, :language_id, :monument_id)
 		');
 		$stmt2 = $this->getConnection()->prepare('
 			UPDATE monument_characteristics
@@ -303,7 +315,24 @@ class MonumentDAO extends DAO {
 				$stmt->bindParam(':id', $characteristic->getId());
 			}
 			else {
-				$stmt = $stmt1;
+				$stmt = $this->getConnection()->prepare('
+					SELECT mc.id
+					FROM monument_characteristics mc
+					INNER JOIN language l ON mc.language_id = l.id
+					WHERE mc.monument_id = :monument_id AND l.name = :l_name AND l.value = :l_value
+				');
+				$stmt->bindParam(':monument_id', $monumentId);
+				$stmt->bindParam(':l_name', $characteristic->getLanguage()->getName());
+				$stmt->bindParam(':l_value', $characteristic->getLanguage()->getValue());
+				$stmt->execute();
+
+				if($row = $stmt->fetch()) {
+					$stmt = $stmt2;
+					$stmt->bindParam(':id', $row['id']);
+				}
+				else {
+					$stmt = $stmt1;
+				}
 			}
 			$languageDAO = new LanguageDAO($this->getConnection());
 			$languageId = $languageDAO->save($characteristic->getLanguage());

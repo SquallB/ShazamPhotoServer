@@ -1,0 +1,25 @@
+<div class="list-group">
+	<div class="list-group-item" ng-repeat="monument in monumentsCtrl.getMonuments()">
+		<h3 style="cursor:pointer;" ng-click="monumentsCtrl.toogleDetails(monument)">{{monument.characteristics[monument.languageId].name}}</h3>
+		<div ng-show="monument.isActive">
+			<p class="pull-left" style="margin-right:15px;"><img src="{{monument.photopath}}" alt="photo" class="img-thumbnail" style="width:200px; height:200px" /></p>
+			<p class="pull-right">
+				<select class="form-control" ng-model="monument.languageId">
+					<option ng-repeat="characteristic in monument.characteristics track by $index" value="$index" ng-selected="$index == monument.languageId" ng-click="monumentsCtrl.changeLanguage(monument, $index)">{{characteristic.language.name}}</option>
+				</select>
+			</p>
+			<div style="width:70%;">
+				<p>ID : {{monument.id}}</p>
+				<p><input type="text" class="form-control" style="width:10%;" name="name" id="nblikes" ng-model="monument.nblikes" ng-show="monument.editMode" /><span ng-hide="monument.editMode">{{monument.nblikes}}</span> likes et <input type="text" class="form-control" style="width:10%;" name="nbvisitors" id="nbvisitors" ng-model="monument.nbvisitors" ng-show="monument.editMode" /><span ng-hide="monument.editMode">{{monument.nbvisitors}}</span> visiteurs</p>
+				<p>Construit en <input type="text" class="form-control" style="width:10%;" name="year" id="year" ng-model="monument.year" ng-show="monument.editMode" /><span ng-hide="monument.editMode">{{monument.year}}</span></p>
+				<p>Position : <input type="text" class="form-control" style="width:20%;" name="latitude" id="latitude" ng-model="monument.localization.latitude" ng-show="monument.editMode" /><span ng-hide="monument.editMode">({{monument.localization.latitude}}</span>, <input type="text" class="form-control" style="width:20%;" name="longitude" id="longitude" ng-model="monument.localization.longitude" ng-show="monument.editMode" /><span ng-hide="monument.editMode">{{monument.localization.longitude}})</span></p>
+				<p>Adresse : <input type="text" class="form-control" style="width:15%;" name="number" id="number" ng-model="monument.address.number" ng-show="monument.editMode" /><span ng-hide="monument.editMode">{{monument.address.number}}</span> <input type="text" class="form-control" style="width:40%;" name="street" id="street" ng-model="monument.address.street" ng-show="monument.editMode" /><span ng-hide="monument.editMode">{{monument.address.street}}</span>, <input type="text" class="form-control" style="width:20%;" name="city" id="city" ng-model="monument.address.city.name" ng-show="monument.editMode" /><span ng-hide="monument.editMode">{{monument.address.city.name}}</span>, <input type="text" class="form-control" style="width:20%;" name="country" id="country" ng-model="monument.address.city.country.name" ng-show="monument.editMode" /><span ng-hide="monument.editMode">{{monument.address.city.country.name}}</span></p>
+				<p><input type="text" class="form-control" style="width:20%;" name="description" id="description" ng-model="monument.characteristics[monument.languageId].description" ng-show="monument.editMode" /><span ng-hide="monument.editMode">{{monument.characteristics[monument.languageId].description}}</p>
+				<p>
+					<button class="btn btn-primary" ng-click="monumentsCtrl.editMonument(monument)"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></button>
+					<button class="btn btn-danger" ng-click="monumentsCtrl.deleteMonument(monument)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+				</p>
+			</div>
+		</div>
+	</div>
+</div>

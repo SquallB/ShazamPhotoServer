@@ -1,7 +1,7 @@
 <?php
-	header("Access-Control-Allow-Orgin: *");
-    header("Access-Control-Allow-Methods: GET, POST, PUT");
-    header("Content-Type: application/json; charset=utf-8");
+	header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
+    header('Content-Type: application/json; charset=utf-8');
 
     $method = $_SERVER['REQUEST_METHOD'];
 
@@ -10,12 +10,11 @@
     }
     else if($method === 'POST') {
     	$args = $_POST;
-
-        if(isset($_FILES['photo'])) {
-            $args['photo'] = $_FILES['photo'];
-        }
     }
     else if($method === 'PUT') {
+        parse_str(file_get_contents("php://input"), $args);
+    }
+    else if($method === 'DELETE') {
         parse_str(file_get_contents("php://input"), $args);
     }
 

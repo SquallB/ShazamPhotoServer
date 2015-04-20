@@ -1,0 +1,55 @@
+<p>
+	<button type="button" class="btn btn-default" ng-click="form.display()">Ajouter un monument</button>
+</p>
+
+<form name="form.monumentForm" ng-show="form.isDisplayed">
+	<div class="form-group">
+		<label for="name">Nom</label>
+		<input type="text" class="form-control" name="name" id="name" ng-model="form.monument.characteristics[0].name" />
+	</div>
+	<div class="form-group">
+		<label for="photopath">Chemin de la photo</label>
+		<input type="text" class="form-control" name="photopath" id="photopath" ng-model="form.monument.photoPath" />
+	</div>
+	<div class="form-group">
+		<label for="year">Année de construction</label>
+		<input type="text" class="form-control" name="year" id="year" ng-model="form.monument.year" />
+	</div>
+	<div class="form-group">
+		<label for="latitude">Latitude</label>
+		<input type="text" class="form-control" name="latitude" id="latitude" ng-model="form.monument.localization.latitude" />
+	</div>
+	<div class="form-group">
+		<label for="longitude">Longitude</label>
+		<input type="text" class="form-control" name="longitude" id="longitude" ng-model="form.monument.localization.longitude" />
+	</div>
+	<div class="form-group">
+		<label for="description">Description</label>
+		<textarea class="form-control" name="description" id="description" ng-model="form.monument.characteristics[0].description"></textarea>
+	</div>
+	<div class="form-group">
+		<label for="number">Numéro</label>
+		<input type="text" class="form-control" name="number" id="number" ng-model="form.monument.address.number" />
+	</div>
+	<div class="form-group">
+		<label for="street">Rue</label>
+		<input type="text" class="form-control" name="street" id="street" ng-model="form.monument.address.street" />
+	</div>
+	<div class="form-group">
+		<label for="city">Ville</label>
+		<input type="text" class="form-control" name="city" id="city" ng-model="form.monument.address.city.name" />
+	</div>
+	<div class="form-group">
+		<label for="country">Pays</label>
+		<input type="text" class="form-control" name="country" id="country" ng-model="form.monument.address.city.country.name" />
+	</div>
+	<div class="form-group">
+		<label for="language">Langue</label>
+		<input type="text" class="form-control" name="language" id="language" ng-model="form.monument.characteristics[0].language.name" />
+		<input type="text" class="form-control" name="language2" id="language2" ng-model="form.monument.characteristics[0].language.value" />
+	</div>
+	<div class="form-group">
+		<button type="submit" class="btn btn-primary" ng-click="form.submit()">Ajouter</button>
+		<button class="btn btn-danger" ng-click="form.hide()">Annuler</button>
+	</div>
+</form>

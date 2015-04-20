@@ -14,7 +14,7 @@ class MonumentAPI extends API {
 	//return an array (called search) with monuments
 	public function searchByName($name) {
 		$dao = new MonumentDAO();
-		$monuments = $dao->searchByName($name);
+		$monuments = $dao->searchByName($name, false);
 
 		return array("Search" => $monuments);
 	}
@@ -23,7 +23,14 @@ class MonumentAPI extends API {
 	//the specifed position
 	public function searchByLocalization($latitude, $longitude, $offset) {
 		$dao = new MonumentDAO();
-		$monuments = $dao->searchByLocalization($latitude, $longitude, $offset);
+		$monuments = $dao->searchByLocalization($latitude, $longitude, $offset, false);
+
+		return array("Search" => $monuments);
+	}
+
+	public function getAll() {
+		$dao = new MonumentDAO();
+		$monuments = $dao->findAll(false);
 
 		return array("Search" => $monuments);
 	}
@@ -47,6 +54,9 @@ class MonumentAPI extends API {
 				}
 				$return = $this->searchByLocalization($args['la'], $args['lo'], $offset);
 			}
+			else {
+				$return = $this->getAll();
+			}
 		}
 		else if($this->getMethod() === 'POST') {
 			if(isset($args['monument'])) {
@@ -61,57 +71,82 @@ class MonumentAPI extends API {
 					}
 				}
 				$monumentDAO = new MonumentDAO();
-				$monumentDAO->save($monument);
+				$monument->setId($monumentDAO->save($monument));
 				$return = $monument;
 			}
 		}
 		else if($this->getMethod() === 'PUT') {
 			if(isset($args['id'])) {
 				$monumentDAO = new MonumentDAO();
-				$monument = $monumentDAO->find($args['id']);
 				
-				if(isset($args['nblikes'])) {
-					$nbLikes = $monument->getNbLikes();
-					if($args['nblikes']) {
-						$nbLikes++;
-					}
-					else {
-						$nbLikes--;
-					}
-					$monument->setNbLikes($nbLikes);
+				if(isset($args['monument'])) {
+					$monument = new Monument(json_decode($args['monument'], true));
+					$monument->setId($args['id']);
 				}
-				if(isset($args['nbvisitors'])) {
-					$nbVisitors = $monument->getNbVisitors();
-					if($args['nbvisitors']) {
-						$nbVisitors++;
+				else {
+					$monument = $monumentDAO->find($args['id']);
+
+					if(isset($args['nblikes'])) {
+						$nbLikes = $monument->getNbLikes();
+						if($args['nblikes']) {
+							$nbLikes++;
+						}
+						else {
+							$nbLikes--;
+						}
+						$monument->setNbLikes($nbLikes);
 					}
-					else {
-						$nbVisitors--;
+					if(isset($args['nbvisitors'])) {
+						$nbVisitors = $monument->getNbVisitors();
+						if($args['nbvisitors']) {
+							$nbVisitors++;
+						}
+						else {
+							$nbVisitors--;
+						}
+						$monument->setNbVisitors($nbVisitors);
 					}
-					$monument->setNbVisitors($nbVisitors);
-				}
-				if(isset($args['descriptors'])) {
-					$descriptors = $monument->getDescriptors();
-					$json = json_decode($args['descriptors'], true);
-					foreach($json as $newDescriptor) {
-						$descriptors[] = new Descriptor($newDescriptor);
+					if(isset($args['descriptors'])) {
+						$descriptors = $monument->getDescriptors();
+						$json = json_decode($args['descriptors'], true);
+						foreach($json as $newDescriptor) {
+							$descriptors[] = new Descriptor($newDescriptor);
+						}
+						$monument->setDescriptors($descriptors);
 					}
-					$monument->setDescriptors($descriptors);
-				}
-				if(isset($args['listskeypoints'])) {
-					$listsKeyPoints = $monument->getListsKeyPoints();
-					$json = json_decode($args['listskeypoints'], true);
-					foreach($json as $list) {
-						$listsKeyPoints[] = new ListKeyPoints($list);
+					if(isset($args['listskeypoints'])) {
+						$listsKeyPoints = $monument->getListsKeyPoints();
+						$json = json_decode($args['listskeypoints'], true);
+						foreach($json as $list) {
+							$listsKeyPoints[] = new ListKeyPoints($list);
+						}
+						$monument->setListsKeyPoints($listsKeyPoints);
 					}
-					$monument->setListsKeyPoints($listsKeyPoints);
+					if(isset($args['characteristics'])) {
+						$characteristics = $monument->getCharacteristics();
+						$characteristics[] = new MonumentCharacteristics(json_decode($args['characteristics'], true));
+						$monument->setCharacteristics($characteristics);
+					}
 				}
 
 				$monumentDAO->save($monument);
 				$return = $monument;
 			}
-			else {
-				$return = $args;
+		}
+		else if($this->getMethod() === 'DELETE') {
+			if(isset($args['id'])) {
+				$monumentDAO = new MonumentDAO();
+				$monument = $monumentDAO->find($args['id']);
+				if($monument->getId() !== null) {
+					if($monument->getPhotoPath() !== null && $monument->getPhotoPath() !== '') {
+						$filePath = '/home/shazam/public_html/photos/' . basename($monument->getPhotoPath());
+						if(file_exists($filePath)) {
+							unlink($filePath);
+						}
+					}
+				}
+
+				$monumentDAO->delete($monument);
 			}
 		}
 
