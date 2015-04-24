@@ -9,6 +9,7 @@ include_once('LanguageDAO.class.php');
 include_once('ListKeyPoints.class.php');
 include_once('KeyPoint.class.php');
 
+//Class that acts as an interface between the database and the monument class.
 class MonumentDAO extends DAO {
 	public function __constrct(PDO $connection = null) {
 		parent::__constrct($connection);
@@ -72,6 +73,7 @@ class MonumentDAO extends DAO {
 		return $descriptors;
 	}
 
+	//Returns the monument identified by the given id.
 	public function find($id, $descriptors = true) {
 		 $stmt = $this->getConnection()->prepare('
 			SELECT m.id, m.photoPath, m.year, m.nbVisitors, m.nbLikes, l.id as l_id, l.latitude, l.longitude, a.id as a_id, a.number, a.street, ci.id as ci_id, ci.name as ci_name, co.id as co_id, co.name as co_name
@@ -95,6 +97,7 @@ class MonumentDAO extends DAO {
 		return $monument;
 	}
 
+	//Returns all monuments.
 	public function findAll($descriptors = true) {
 		$stmt = $this->getConnection()->prepare('
 			SELECT m.id, m.photopath, m.year, m.nbvisitors, m.nblikes, l.id as l_id, l.latitude, l.longitude, a.id as a_id, a.number, a.street, ci.id as ci_id, ci.name as ci_name, co.id as co_id, co.name as co_name
@@ -177,6 +180,7 @@ class MonumentDAO extends DAO {
 		return $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
 	}
 
+	//Adds a new monument to the database.
 	public function save($data) {
 		if($data->getId() !== null) {
 			return $this->update($data);
@@ -269,6 +273,7 @@ class MonumentDAO extends DAO {
 		return $monumentId;
 	}
 
+	//Updates an already existing monument.
 	public function update($data) {
 		if($data->getId() === null) {
 			throw new \LogicException(
@@ -429,6 +434,7 @@ class MonumentDAO extends DAO {
 		return $monumentId;
 	}
 
+	//Delete the given monument.
 	public function delete($data) {
 		if($data->getId() === null) {
 			throw new \LogicException(

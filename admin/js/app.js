@@ -1,6 +1,7 @@
 (function() {
 	var app = angular.module('monumentsManager', []);
 
+	//This factory is used to store the monuments retrieved from the API.
 	app.factory('monuments', function() {
         var monuments = {};
 
@@ -57,6 +58,11 @@
 					    headers: {'Content-Type': 'application/x-www-form-urlencoded'}
 					});
 					monuments.getMonuments().splice(monuments.getMonuments().indexOf(monument), 1);
+				};
+
+				this.confirmDelete = function(monument) {
+					$('#model').modal('show');
+					$('#buttonDeleteModal').on('click', this.deleteMonument(monument));
 				};
 
 				this.toogleDetails = function(monument) {

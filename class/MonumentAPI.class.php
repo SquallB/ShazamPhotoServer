@@ -5,13 +5,14 @@ include_once('MonumentDAO.class.php');
 include_once('Descriptor.class.php');
 include_once('ListKeyPoints.class.php');
 
+//Class that handles the requests on the API and returns the corresponding output.
 class MonumentAPI extends API {
 	public function __construct($args, $method, $returnType = 0) {
 		parent::__construct($args, $method, $returnType);
 	}
 
-	//performs a query in the dabatase to look for monuments with a name containing the string
-	//return an array (called search) with monuments
+	//Performs a query in the dabatase to look for monuments with a name containing the string,
+	//returns an array (called search) with monuments.
 	public function searchByName($name) {
 		$dao = new MonumentDAO();
 		$monuments = $dao->searchByName($name, false);
@@ -19,8 +20,8 @@ class MonumentAPI extends API {
 		return array("Search" => $monuments);
 	}
 
-	//return the monuments localized in a square (its size is determined by the offset) around
-	//the specifed position
+	//Return the monuments localized in a square (its size is determined by the offset) around
+	//the specifed position.
 	public function searchByLocalization($latitude, $longitude, $offset) {
 		$dao = new MonumentDAO();
 		$monuments = $dao->searchByLocalization($latitude, $longitude, $offset, false);
@@ -35,12 +36,14 @@ class MonumentAPI extends API {
 		return array("Search" => $monuments);
 	}
 
-	//function used to process the api, using the given method and arguments
-	//return something in json
+	//Function used to process the api, using the given method and arguments,
+	//return a json object (usually containing monuments).
 	public function processAPI() {
 		$return = '{}';
 		$args = $this->getArgs();
 		
+		//GET method : return an array of monuments according to the specified arguments
+		//(return all monuments if there is no arguments).
 		if($this->getMethod() === 'GET') {
 			if(isset($args['n'])) {
 				$return = $this->searchByName($args['n']);
@@ -58,6 +61,7 @@ class MonumentAPI extends API {
 				$return = $this->getAll();
 			}
 		}
+		//POST method : add a monuments to the database (the monument must be an argument in json).
 		else if($this->getMethod() === 'POST') {
 			if(isset($args['monument'])) {
 				$monument = new Monument(json_decode($args['monument'], true));
@@ -75,6 +79,7 @@ class MonumentAPI extends API {
 				$return = $monument;
 			}
 		}
+		//PUT method : updates the data of the monument identified by the given id.
 		else if($this->getMethod() === 'PUT') {
 			if(isset($args['id'])) {
 				$monumentDAO = new MonumentDAO();
@@ -133,6 +138,7 @@ class MonumentAPI extends API {
 				$return = $monument;
 			}
 		}
+		//DELETE method : delete the monument identified by the given id
 		else if($this->getMethod() === 'DELETE') {
 			if(isset($args['id'])) {
 				$monumentDAO = new MonumentDAO();

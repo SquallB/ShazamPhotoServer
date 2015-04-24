@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 2.8)
+project( compare )
+find_package( OpenCV REQUIRED )
+find_package(RapidJSON)
+add_executable( compare compare.cpp base64.cpp )
+target_link_libraries( compare ${OpenCV_LIBS} )
